@@ -1,0 +1,333 @@
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+#wrapper {
+    min-height: 100vh;
+    width: 100%;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.container {
+    width: 100%;
+    max-width: 1280px;
+    padding: 0 10px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+.center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.row {
+    display: flex;
+    gap: 10px;
+}
+
+.form {
+    width: 100%;
+    max-width: 540px;
+    box-sizing: border-box;
+    border-radius: 10px
+}
+
+.form h3,
+.form p {
+    color: #262626;
+    width: 100%;
+    text-align: center;
+    margin: 10px 0;
+}
+
+.form p {
+    margin-bottom: 20px;
+}
+
+.form .form-field {
+    min-height: 40px;
+    line-height: 40px;
+    display: flex;
+    flex-wrap: wrap;
+    margin: 10px 0;
+    width: 100%;
+    gap: 5px 20px;
+    justify-content: center;
+}
+
+.form .form-field label {
+    font-size: 15px;
+    flex: 1 1 200px;
+    color: #444;
+    order: -1;
+}
+
+.form .form-field input,
+.form .form-field select {
+    flex: 2 1 200px;
+    height: 40px;
+    border-radius: 5px;
+    border: 1px solid #999;
+    padding: 0 10px;
+    font-size: 15px;
+    color: #444;
+    box-sizing: border-box;
+}
+
+.form .form-field input[required]~label::after,
+.form .form-field select[required]~label::after {
+    content: "*";
+    color: rgb(226, 42, 88);
+    margin-left: 2px;
+}
+
+.form .form-field button {
+    flex: 1 1;
+    max-width: 300px;
+    border-radius: 5px;
+    border: 2px solid;
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.form .form-field button:not([disabled]) {
+    cursor: pointer;
+}
+
+.form .form-field button[type=submit] {
+    background: rgb(9, 195, 58);
+    color: #fff;
+}
+
+.form .msg {
+    font-size: 13px;
+    margin: 20px 0;
+    text-align: center;
+    color: rgb(255, 72, 72);
+    font-weight: 550;
+}
+
+.form .msg.success {
+    color: rgb(26, 199, 58);
+}
+
+#login-page {
+    height: 100vh;
+}
+
+#login-page .form {
+    padding: 20px;
+    background: #efefef;
+}
+
+header {
+    height: 60px;
+    width: 100%;
+    background: #54e1ff;
+    color: #3e3e3e;
+    /* }
+
+header .container { 
+    height: 100%; */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10px;
+    box-sizing: border-box;
+}
+
+header #site_logo h2 {
+    margin: 0;
+}
+
+header #header_user {
+    display: flex;
+    gap: 10px;
+    height: 100%;
+    font-size: 14px;
+    align-items: center;
+
+}
+
+header #header_user img {
+    height: 40px;
+    mix-blend-mode: color-burn;
+}
+
+#main {
+    display: flex;
+    min-height: calc(100vh - 60px);
+}
+
+#main nav {
+    width: 180px;
+    background: #efefef;
+}
+
+#main nav li {
+    line-height: 30px;
+    margin: 10px;
+    display: block;
+}
+
+#main nav li a {
+    color: #262626;
+    text-decoration: none;
+    display: block;
+    padding: 0 10px;
+    box-sizing: border-box;
+}
+
+#main_section {
+    flex: 1;
+    overflow: hidden;
+}
+
+#main_section .page-title {
+    width: 100%;
+    text-align: center;
+    color: #262626;
+}
+
+#filter-options {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+#filter-options .search-form.form {
+    width: 200px;
+}
+
+#actions-btn {
+    margin: 20px 0;
+    justify-content: center;
+}
+
+#actions-btn button {
+    line-height: 40px;
+    padding: 0 10px;
+    border: 0;
+    font-weight: 600;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button.btn-info {
+    background: #00c9ff;
+    color: #fff;
+}
+
+button.btn-danger {
+    background: #ff2353;
+    color: #fff;
+}
+
+button.btn-warning {
+    background: #ffd91e;
+    color: #fff;
+}
+
+button.btn-primary {
+    background: #09c33a;
+    color: #fff;
+}
+
+dialog {
+    width: 95%;
+    max-width: 720px;
+    border-radius: 10px;
+    box-sizing: border-box;
+    position: relative;
+    border: 0;
+}
+
+dialog::backdrop {
+    background: #26262650;
+}
+
+dialog .close {
+    position: absolute;
+    z-index: 1;
+    width: 40px;
+    line-height: 40px;
+    text-align: center;
+    aspect-ratio: 1;
+    top: 0;
+    right: 0;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+dialog .title {
+    text-align: center;
+    font-size: 18px;
+    font-weight: 600;
+    color: #262626;
+    margin: 20px 0;
+}
+
+dialog .scroll-section {}
+
+.table-record {
+    overflow: auto;
+    width: 100%;
+}
+
+table {
+    min-width: 100%;
+    border-spacing: 0;
+}
+
+table tr {
+    line-height: 40px;
+    color: #444;
+}
+
+table tr:nth-child(2n+1) {
+    background: rgb(248, 248, 248);
+}
+
+table tr th,
+table tr:nth-child(2n) {
+    background: rgb(217, 217, 217);
+}
+
+table th,
+table td {
+    padding: 0 10px;
+    max-width: 300px;
+    white-space: nowrap;
+    text-align: center;
+}
+
+table td.error {
+    column-span: all;
+    text-align: center;
+    color: rgb(155, 155, 155);
+    line-height: 50px;
+    font-size: 20px;
+    font-weight: 550;
+}
+
+table td.actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 40px;
+    gap: 5px;
+    white-space: nowrap;
+}
+
+table td button {
+    border: 0;
+    border-radius: 5px;
+    height: 30px;
+    line-height: 30px;
+    padding: 0 10px;
+    cursor: pointer;
+}
