@@ -131,7 +131,7 @@ if (isset ($_GET['class'])) {
                             <form action="" class="row" data-allow-submit>
                                 <div class="form-field">
                                     <select name="class" id="" value="<?= $class_id ?>">
-                                        <option value="" selected disabled>Choose Class</option>
+                                        <option value="" selected>Choose Class</option>
 
                                         <?php
                                         $query = mysqli_query($con, "SELECT * FROM classes");
