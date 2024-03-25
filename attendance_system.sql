@@ -31,12 +31,26 @@ CREATE TABLE `classes` (
 	PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
 
+CREATE TABLE `permissions` (
+	`id` int(11) NOT NULL,
+	`name` varchar(255) NOT NULL,
+	PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+CREATE TABLE `role_has_permission` (
+	`id` int(11) NOT NULL,
+	`role` enum('hod','faculty','staff') NOT NULL,
+	`permission` int(11) NOT NULL,
+	PRIMARY KEY (`id`),
+	KEY `FOREIGN_PERMISSION` (`permission`),
+	CONSTRAINT `FOREIGN_PERMISSION` FOREIGN KEY (`permission`) REFERENCES `permissions` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+
 CREATE TABLE `students` (
 	`enrollment_number` varchar(255) NOT NULL,
 	`name` varchar(255) NOT NULL,
 	`mobile` bigint(20) NOT NULL,
 	`gender` enum('M','F','O') NOT NULL,
-	`class_id` varchar(255) NOT NULL,
+	`class_id` varchar(255) DEFAULT NULL,
 	PRIMARY KEY (`enrollment_number`),
 	KEY `FOREIGN_CLASS` (`class_id`),
 	CONSTRAINT `FOREIGN_CLASS` FOREIGN KEY (`class_id`) REFERENCES `classes` (`id`)
@@ -66,9 +80,11 @@ CREATE TABLE `teaches` (
 CREATE TABLE `users` (
 	`id` varchar(255) NOT NULL,
 	`name` varchar(255) NOT NULL,
-	`contact_number` bigint(20) NOT NULL,
+	`mobile` bigint(20) NOT NULL,
+	`user` varchar(255) NOT NULL,
 	`password` varchar(255) NOT NULL,
 	`type` enum('permanent','guest') NOT NULL,
-	`position` enum('hod','faculty','staff') NOT NULL,
-	PRIMARY KEY (`id`)
+	`role` enum('hod','faculty','staff') NOT NULL,
+	PRIMARY KEY (`id`),
+	UNIQUE KEY `PRIMARY2` (`user`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci

@@ -20,7 +20,7 @@ if (strtolower($_SERVER['REQUEST_METHOD']) == 'post' || strtolower($_SERVER['REQ
     $name = mysqli_real_escape_string($con, trim($_REQUEST['name']));
     $gender = mysqli_real_escape_string($con, trim($_REQUEST['gender']));
     $mobile = mysqli_real_escape_string($con, trim($_REQUEST['mobile']));
-    $class_id = isset ($_REQUEST['class']) ? mysqli_real_escape_string($con, trim($_REQUEST['class'])) : "NULL";
+    $class_id = isset ($_REQUEST['class']) ? mysqli_real_escape_string($con, trim($_REQUEST['class'])) : "";
 
     if (empty ($enrollment) || empty ($name) || empty ($gender) || empty ($mobile)) {
         http_response_code(403);
@@ -40,10 +40,18 @@ if (strtolower($_SERVER['REQUEST_METHOD']) == 'post' || strtolower($_SERVER['REQ
                 'message' => 'This Enrollment number already exists'
             ]));
         }
-        $query = mysqli_query($con, "INSERT INTO students(enrollment_number, name, gender, mobile, class_id) VALUES('$enrollment', '$name', '$gender', '$mobile', $class_id)") or die (mysqli_error($con));
 
+        $insertValue = "'$enrollment', '$name', '$gender', '$mobile'";
+        if (empty ($class_id))
+            $insertValue .= ", NULL";
+        else
+            $insertValue .= ", '$class_id'";
+
+        $query = mysqli_query($con, "INSERT INTO students(enrollment_number, name, gender, mobile, class_id) VALUES($insertValue)") or die (mysqli_error($con));
+
+        http_response_code(201);
         die (json_encode([
-            'status' => 'error',
+            'status' => 'success',
             'message' => 'Student Added'
         ]));
     } else {
@@ -55,10 +63,12 @@ if (strtolower($_SERVER['REQUEST_METHOD']) == 'post' || strtolower($_SERVER['REQ
                 'message' => 'Invalid Enrollment'
             ]));
         }
-        $query = mysqli_query($con, "UPDATE students SET name = '$name', gender = '$gender', mobile = '$mobile', class_id = $class_id WHERE enrollment_number = '$enrollment'");
+        $updateData = "name = '$name', gender = '$gender', mobile = '$mobile'";
+        if (!empty ($class_id)) {
+            $updateData .= ", class_id = '$class_id'";
+        }
+        $query = mysqli_query($con, "UPDATE students SET $updateData WHERE enrollment_number = '$enrollment'");
 
-
-        http_response_code(201);
         die (json_encode([
             'status' => 'success',
             'message' => 'Student Details Updated'
@@ -127,9 +137,9 @@ if (isset ($_GET['class'])) {
                                         $query = mysqli_query($con, "SELECT * FROM classes");
                                         while ($row = mysqli_fetch_array($query)) {
                                             ?>
-                                            <option value="<?= $row['id'] ?>">
+                                            <option value="<?= $row['id'] ?>" <?= $row['id'] == $class_id ? "selected" : "" ?>>
                                                 <?= $row['semester'] ?> Sem - Batch
-                                                <?= $row['batch'] ?>">
+                                                <?= $row['batch'] ?>
                                             </option>
                                             <?php
                                         }
@@ -144,7 +154,9 @@ if (isset ($_GET['class'])) {
                         </div>
 
                         <div class="search-form form">
-                            <form data-search-record="">
+                            <form data-search-record=".table-record tbody tr"
+                                data-search-column=".table-record td:nth-child(2), .table-record td:nth-child(3) .table-record td:nth-child(4) .table-record td:nth-child(5)"
+                                data-submit-block>
                                 <div class="form-field">
                                     <input type="search" placeholder="Search..." name="search" id="search" />
                                 </div>
@@ -203,7 +215,7 @@ if (isset ($_GET['class'])) {
                                                 ?>
                                                 <option value="<?= $row['id'] ?>">
                                                     <?= $row['semester'] ?> Sem - Batch
-                                                    <?= $row['batch'] ?>">
+                                                    <?= $row['batch'] ?>
                                                 </option>
                                                 <?php
                                             }
@@ -269,7 +281,7 @@ if (isset ($_GET['class'])) {
                                                 ?>
                                                 <option value="<?= $row['id'] ?>">
                                                     <?= $row['semester'] ?> Sem - Batch
-                                                    <?= $row['batch'] ?>">
+                                                    <?= $row['batch'] ?>
                                                 </option>
                                                 <?php
                                             }
@@ -304,7 +316,11 @@ if (isset ($_GET['class'])) {
                             <tbody>
 
                                 <?php
-                                $query = mysqli_query($con, "SELECT * FROM students WHERE class_id = '$class_id' ORDER BY enrollment_number ASC");
+                                $queryData = '';
+                                if (!empty ($class_id)) {
+                                    $queryData .= "WHERE class_id = '$class_id'";
+                                }
+                                $query = mysqli_query($con, "SELECT * FROM students $queryData ORDER BY enrollment_number ASC");
                                 $count = 1;
                                 if (mysqli_num_rows($query) > 0) {
                                     while ($row = mysqli_fetch_array($query)) {

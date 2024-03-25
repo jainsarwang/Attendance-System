@@ -303,6 +303,7 @@ table td {
     max-width: 300px;
     white-space: nowrap;
     text-align: center;
+    text-transform: capitalize;
 }
 
 table td.error {

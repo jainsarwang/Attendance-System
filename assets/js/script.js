@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
 	// for all forms
-	document.querySelectorAll("form:not([data-allow-submit])").forEach((form) => {
+	document.querySelectorAll("form:not([data-allow-submit], [data-submit-block])").forEach((form) => {
 		const msg = form.querySelector(".msg");
 
 		form.addEventListener("submit", async function (e) {
@@ -25,7 +25,6 @@ document.addEventListener("DOMContentLoaded", function () {
 						method: method,
 					});
 				} else {
-					alert(method);
 					res = await fetch(action, {
 						method: method,
 						body: body.join("&"),
@@ -59,6 +58,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
 				msg.innerHTML = "Unable to connect to server";
 			}
+		});
+	});
+
+	document.querySelectorAll(".search-form form").forEach((form) => {
+		form.querySelector("input[type='search']").addEventListener("input", function () {
+			form.dispatchEvent(new Event("submit"));
+		});
+
+		form.addEventListener("submit", function (e) {
+			e.preventDefault();
+
+			const search = form.search.value.toLowerCase().trim();
+
+			document.querySelectorAll(form.dataset.searchRecord).forEach((record) => {
+				if (record.innerText.toLowerCase().indexOf(search) > -1)
+					record.closest("tr").style.display = "table-row";
+				else record.closest("tr").style.display = "none";
+			});
 		});
 	});
 });
