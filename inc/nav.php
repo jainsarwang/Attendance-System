@@ -1,5 +1,5 @@
 <nav>
-    <li><a href="#">Dashboard</a></li>
+    <li><a href="./">Dashboard</a></li>
     <li><a href="subject.php">Subject</a></li>
     <li><a href="class.php">Class</a></li>
     <li><a href="faculty.php">Faculty</a></li>

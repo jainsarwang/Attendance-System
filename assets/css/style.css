@@ -36,6 +36,14 @@ body {
     border-radius: 10px
 }
 
+.error {
+    text-align: center;
+    color: rgb(155, 155, 155);
+    line-height: 50px;
+    font-size: 20px;
+    font-weight: 550;
+}
+
 .form h3,
 .form p {
     color: #262626;
@@ -288,6 +296,10 @@ table tr {
     color: #444;
 }
 
+table tr:focus {
+    outline: 2px solid #000;
+}
+
 table tr:nth-child(2n+1) {
     background: rgb(248, 248, 248);
 }
@@ -304,15 +316,11 @@ table td {
     white-space: nowrap;
     text-align: center;
     text-transform: capitalize;
+    position: relative;
 }
 
 table td.error {
     column-span: all;
-    text-align: center;
-    color: rgb(155, 155, 155);
-    line-height: 50px;
-    font-size: 20px;
-    font-weight: 550;
 }
 
 table td.actions {
@@ -330,5 +338,80 @@ table td button {
     height: 30px;
     line-height: 30px;
     padding: 0 10px;
+    cursor: pointer;
+}
+
+table td .attendance {
+    position: relative;
+    width: 60px;
+    height: 30px;
+    border-radius: 15px;
+    border: 2px solid #fff;
+    box-shadow: inset 0 0 2px #262626;
+    overflow: hidden;
+}
+
+table td .attendance input[type=checkbox] {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    /* visibility: hidden; */
+    opacity: 0;
+}
+
+table td .attendance .trigger {
+    height: 22px;
+    line-height: 22px;
+    position: absolute;
+    aspect-ratio: 1;
+    background: #efefef;
+    box-shadow: 0 0 2px #444;
+    border-radius: 50%;
+    top: 4px;
+    left: 4px;
+    font-size: 15px;
+    pointer-events: none;
+    transition: 0.15s ease-in-out
+}
+
+table td .attendance .trigger::before {
+    content: "P";
+    color: #034424;
+    position: absolute;
+    left: -22px;
+}
+
+table td .attendance .trigger::after {
+    content: "A";
+    color: #f61b1b;
+    position: absolute;
+    right: -22px;
+}
+
+table td .attendance input[type=checkbox]:checked~.trigger {
+    left: 34px;
+}
+
+th .hover-btn {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: inherit;
+    opacity: 0;
+    transition: 0.2s linear;
+}
+
+th:hover .hover-btn {
+    opacity: 1;
+}
+
+th .hover-btn button {
+    border: 0;
+    border-radius: 5px;
+    line-height: 25px;
     cursor: pointer;
 }

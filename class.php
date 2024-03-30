@@ -9,37 +9,37 @@ if (strtolower($_SERVER['REQUEST_METHOD']) == 'post' || strtolower($_SERVER['REQ
     parse_str(file_get_contents('php://input'), $_REQUEST);
 
     if (
-        !isset ($_REQUEST['batch']) ||
-        !isset ($_REQUEST['department']) ||
-        !isset ($_REQUEST['semester'])
+        !isset($_REQUEST['batch']) ||
+        !isset($_REQUEST['department']) ||
+        !isset($_REQUEST['semester'])
     ) {
         http_response_code(403);
-        die (json_encode([
+        die(json_encode([
             'status' => 'error',
             'message' => 'All fields are required'
         ]));
     }
 
-    if ($_SERVER['REQUEST_METHOD'] == 'put' && !isset ($_REQUEST['id']) && !empty ($_REQUEST['id'])) {
+    if ($_SERVER['REQUEST_METHOD'] == 'put' && !isset($_REQUEST['id']) && !empty($_REQUEST['id'])) {
         http_response_code(403);
-        die (json_encode([
+        die(json_encode([
             'status' => 'error',
             'message' => 'Id is missing'
         ]));
     }
 
-    $id = isset ($_REQUEST['id']) && !empty ($_REQUEST['id']) ? $_REQUEST['id'] : '';
+    $id = isset($_REQUEST['id']) && !empty($_REQUEST['id']) ? $_REQUEST['id'] : '';
     $batch = mysqli_real_escape_string($con, trim($_REQUEST['batch']));
     $department = mysqli_real_escape_string($con, trim($_REQUEST['department']));
     $semester = mysqli_real_escape_string($con, trim($_REQUEST['semester']));
 
     if (
-        empty ($batch) ||
-        empty ($department) ||
-        empty ($semester)
+        empty($batch) ||
+        empty($department) ||
+        empty($semester)
     ) {
         http_response_code(403);
-        die (json_encode([
+        die(json_encode([
             'status' => 'error',
             'message' => 'All fields are required'
         ]));
@@ -50,17 +50,17 @@ if (strtolower($_SERVER['REQUEST_METHOD']) == 'post' || strtolower($_SERVER['REQ
         // new Faculty
         if (mysqli_num_rows($query) > 0) {
             http_response_code(401);
-            die (json_encode([
+            die(json_encode([
                 'status' => 'error',
                 'message' => 'This class is already Exists'
             ]));
         }
 
         $id = md5($userData['id'] . "class" . time());
-        $query = mysqli_query($con, "INSERT INTO classes(id, batch, department, semester) VALUES('$id', '$batch', '$department', '$semester')") or die (mysqli_error($con));
+        $query = mysqli_query($con, "INSERT INTO classes(id, batch, department, semester) VALUES('$id', '$batch', '$department', '$semester')") or die(mysqli_error($con));
 
         http_response_code(201);
-        die (json_encode([
+        die(json_encode([
             'status' => 'success',
             'message' => 'Class Added'
         ]));
@@ -68,14 +68,14 @@ if (strtolower($_SERVER['REQUEST_METHOD']) == 'post' || strtolower($_SERVER['REQ
         // updating detail
         if (mysqli_num_rows($query) == 0) {
             http_response_code(401);
-            die (json_encode([
+            die(json_encode([
                 'status' => 'error',
                 'message' => 'Invalid Class'
             ]));
         }
         $query = mysqli_query($con, "UPDATE classes SET batch = '$batch', department = '$department', semester = '$semester' WHERE id = '$id'");
 
-        die (json_encode([
+        die(json_encode([
             'status' => 'success',
             'message' => 'Details Updated Successfully'
         ]));
@@ -86,9 +86,9 @@ if (strtolower($_SERVER['REQUEST_METHOD']) == 'post' || strtolower($_SERVER['REQ
 } else if (strtolower($_SERVER['REQUEST_METHOD']) == 'delete') {
     parse_str(file_get_contents('php://input'), $_REQUEST);
 
-    if (!isset ($_REQUEST['id']) || empty ($_REQUEST['id'])) {
+    if (!isset($_REQUEST['id']) || empty($_REQUEST['id'])) {
         http_response_code(403);
-        die (json_encode([
+        die(json_encode([
             'status' => 'error',
             'message' => 'Id is Required'
         ]));
@@ -103,7 +103,7 @@ if (strtolower($_SERVER['REQUEST_METHOD']) == 'post' || strtolower($_SERVER['REQ
 }
 
 $class_id = '';
-if (isset ($_GET['class'])) {
+if (isset($_GET['class'])) {
     $class_id = $_GET['class'];
 }
 ?>
@@ -130,7 +130,7 @@ if (isset ($_GET['class'])) {
                 <div class="container">
 
                     <div class="page-title">
-                        <h3>Faculty and Staffs</h3>
+                        <h3>Classes</h3>
                     </div>
 
                     <div id="filter-options">

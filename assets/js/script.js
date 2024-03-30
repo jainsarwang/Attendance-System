@@ -10,13 +10,23 @@ document.addEventListener("DOMContentLoaded", function () {
 				method = form.dataset.method ?? form.method,
 				formData = new FormData(form),
 				body = [];
-			let iterator = formData.keys();
+			let iterator = formData.entries();
 
 			msg.innerHTML = "";
-			while (!(key = iterator.next()).done) {
-				console.log(key);
-				body.push(key.value + "=" + formData.getAll(key.value));
+			while (!(pair = iterator.next()).done) {
+				console.log(pair);
+				body.push(pair.value[0] + "=" + pair.value[1]);
 			}
+
+			form.querySelectorAll("input[type=checkbox]").forEach((checkbox) => {
+				if (!checkbox.dataset.name) return;
+
+				let value;
+				if (checkbox.checked) value = checkbox.value;
+				else value = checkbox.dataset.falseValue;
+
+				body.push(checkbox.dataset.name + "=" + value);
+			});
 
 			try {
 				let res;
@@ -113,6 +123,7 @@ function closeDialog(e, confirmation = false) {
 }
 
 async function deleteData(event, url, body, removeClosestElem = undefined) {
+	if (!confirm("Do you want to Delete it?")) return;
 	const formData = new FormData();
 	var data = [];
 	body = JSON.parse(body);
