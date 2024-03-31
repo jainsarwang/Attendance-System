@@ -299,7 +299,8 @@ $userSubject = getUserSubjects();
                                             </div>
 
                                             <div class="form-field">
-                                                <input type="date" name="date" id="date" value="" required />
+                                                <input type="date" name="date" id="date" value="<?= date('Y-m-d', time()) ?>"
+                                                    required />
                                                 <label for="date">Date</label>
                                             </div>
 
@@ -316,7 +317,7 @@ $userSubject = getUserSubjects();
                                                     <?php
                                                     $query = mysqli_query($con, "SELECT * FROM students WHERE students.class_id = '$class_id'");
                                                     if (mysqli_num_rows($query) > 0) {
-                                                        $count = 0;
+                                                        $count = 1;
                                                         while ($row = mysqli_fetch_assoc($query)) {
                                                             ?>
                                                             <tr tabindex="0 ">
@@ -491,7 +492,8 @@ $userSubject = getUserSubjects();
                                 $queryData
                                 GROUP BY ar.id, date, a.student_id, t.class_id
                                 ORDER BY ar.time, a.student_id) a 
-                            GROUP BY date, a.student_id, a.class_id) a INNER JOIN `students` s INNER JOIN classes c
+                            GROUP BY date, a.student_id, a.class_id
+                            ORDER BY a.time) a INNER JOIN `students` s INNER JOIN classes c
                         ON a.student_id = s.enrollment_number AND a.class_id = c.id
                         GROUP BY a.student_id, a.class_id
                         ORDER BY c.batch 

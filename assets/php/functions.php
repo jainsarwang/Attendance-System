@@ -100,7 +100,7 @@ function getUserSubjects()
 
     $queryData = constructQueryData($queryData);
 
-    $query = mysqli_query($con, "SELECT subject.* FROM teaches RIGHT JOIN subject ON teaches.subject_id = subject.subject_code $queryData");
+    $query = mysqli_query($con, "SELECT subject.* FROM teaches RIGHT JOIN subject ON teaches.subject_id = subject.subject_code $queryData  GROUP BY subject.subject_code");
 
     $classes = [];
     while ($row = mysqli_fetch_assoc($query))
