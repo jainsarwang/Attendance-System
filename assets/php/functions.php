@@ -56,7 +56,10 @@ function hasPermission($permission)
 {
     global $userData;
 
-    return in_array($permission, $userData['permissions']);
+    if (!defined($permission))
+        return false;
+
+    return in_array(constant($permission), $userData['permissions']);
 }
 
 function constructQueryData($data)
@@ -71,7 +74,7 @@ function getUserClasses()
     global $userData, $con;
 
     $queryData = [];
-    if (in_array(CAN_SEE_ALL_CLASS, $userData['permissions'])) {
+    if (hasPermission("CAN_SEE_ALL_CLASS")) {
 
     } else {
         $queryData[] = "teaches.teacher_id = '" . $userData['id'] . "'";

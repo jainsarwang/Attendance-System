@@ -1,0 +1,5 @@
+# for  
+vendor
+.env
+*.sql
+.notes.md

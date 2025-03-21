@@ -173,7 +173,7 @@ $userSubject = getUserSubjects();
                             <form action="" class="row" data-allow-submit>
                                 <div class="form-field">
                                     <select name="class" id="" value="<?= $class_id ?>">
-                                        <option value="" selected>All</option>
+                                        <option value="" selected>All Classes</option>
 
                                         <?php
                                         foreach ($userClasses as $row) {
@@ -190,7 +190,7 @@ $userSubject = getUserSubjects();
 
                                 <div class="form-field">
                                     <select name="subject" id="">
-                                        <option value="" selected>All</option>
+                                        <option value="" selected>All Subject</option>
 
                                         <?php
                                         foreach ($userSubject as $row) {
@@ -208,7 +208,7 @@ $userSubject = getUserSubjects();
 
                                 <div class="form-field">
                                     <select name="month" id="">
-                                        <option value="" selected>All</option>
+                                        <option value="" selected>All Month</option>
 
                                         <?php
                                         // get oldest time of attendance
@@ -304,7 +304,7 @@ $userSubject = getUserSubjects();
                                                 <label for="date">Date</label>
                                             </div>
 
-                                            <table>
+                                            <table id="attendance_recording_table">
                                                 <thead>
                                                     <tr>
                                                         <th>S. No.</th>
@@ -656,6 +656,19 @@ $userSubject = getUserSubjects();
     </div>
 
     <script src="<?= JS_DIR ?>script.js"></script>
+    <script>
+        document.querySelectorAll('#attendance_recording_table tbody tr').forEach(tr =>
+            tr.addEventListener('keydown', function (e) {
+                const checkbox = tr.querySelector('input[type=checkbox]');
+
+                if (e.code == 'KeyA') {
+                    checkbox.checked = false;
+                } else if (e.code == 'KeyP') {
+                    checkbox.checked = true;
+                }
+            })
+        )
+    </script>
 </body>
 
 </html>

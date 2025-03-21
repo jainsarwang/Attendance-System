@@ -154,7 +154,7 @@ if (isset($_GET['class'])) {
 
                     <dialog class="add-dialog" tabindex="-1">
                         <div class="close" onclick="closeDialog(event, true)">&times;</div>
-                        <div class="title">New Faculty or Staff Detail</div>
+                        <div class="title">New Class Detail</div>
 
                         <div class="scroll-section center">
                             <div class="form">
@@ -178,6 +178,12 @@ if (isset($_GET['class'])) {
                                     </div>
 
                                     <div class="form-field">
+                                        <input type="date" name="sem_start" id="sem_start"
+                                            placeholder="Select Starting Date of Semester" value="" required />
+                                        <label for="sem_start">Semester Starting</label>
+                                    </div>
+
+                                    <div class="form-field">
                                         <button type="submit">Continue</button>
                                     </div>
 
@@ -189,7 +195,7 @@ if (isset($_GET['class'])) {
 
                     <dialog class="edit-dialog" tabindex="-1">
                         <div class="close" onclick="closeDialog(event, true)">&times;</div>
-                        <div class="title">Edit Faculty or Staff Detail</div>
+                        <div class="title">Edit Class Detail</div>
 
                         <div class="scroll-section center">
                             <div class="form">
@@ -215,6 +221,13 @@ if (isset($_GET['class'])) {
                                         <label for="semester">Semester</label>
                                     </div>
 
+
+                                    <div class="form-field">
+                                        <input type="date" name="sem_start" id="sem_start"
+                                            placeholder="Select Starting Date of Semester" value="" required />
+                                        <label for="sem_start">Semester Starting</label>
+                                    </div>
+
                                     <div class="form-field">
                                         <button type="submit">Update</button>
                                     </div>
@@ -233,13 +246,14 @@ if (isset($_GET['class'])) {
                                     <th>Batch</th>
                                     <th>semester</th>
                                     <th>Total Students</th>
+                                    <th>Semester Starting</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
 
                                 <?php
-                                $query = mysqli_query($con, "SELECT c.id, c.batch, c.department, c.semester, count(s.class_id) as total_students FROM classes c LEFT join students s on c.id = s.class_id GROUP BY c.id ORDER BY batch ASC");
+                                $query = mysqli_query($con, "SELECT c.id, c.batch, c.department, c.semester, count(s.class_id) as total_students, c.sem_start FROM classes c LEFT join students s on c.id = s.class_id GROUP BY c.id ORDER BY batch ASC");
                                 $count = 1;
                                 if (mysqli_num_rows($query) > 0) {
                                     while ($row = mysqli_fetch_array($query)) {
@@ -257,6 +271,10 @@ if (isset($_GET['class'])) {
                                             <td>
                                                 <?= $row['total_students'] ?>
                                             </td>
+                                            <td>
+                                                <?= date('d M Y', strtotime($row['sem_start'])) ?>
+                                            </td>
+
 
                                             <td class="actions">
                                                 <button class="btn-primary" onclick='
@@ -265,7 +283,8 @@ if (isset($_GET['class'])) {
                                                             'id' => $row['id'],
                                                             'batch' => $row['batch'],
                                                             'department' => $row['department'],
-                                                            'semester' => $row['semester']
+                                                            'semester' => $row['semester'],
+                                                            'sem_start' => $row['sem_start']
                                                         ]) ?>`
                                                     )
                                                 '>Edit</button>
