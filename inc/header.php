@@ -9,6 +9,14 @@
             alt="User LOGO">
 
         <span><?= $userData['name'] ?></span>
+
+        <div class="pop-down">
+            <ul>
+                <li>
+                    <a href="<?= ROOT ?>logout.php">Logout</a>
+                </li>
+            </ul>
+        </div>
     </div>
     <!-- </div> -->
 </header>
