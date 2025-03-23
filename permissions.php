@@ -95,7 +95,7 @@ if (isset($_GET['class'])) {
                     </div>
 
                     <?php
-                    if (hasPermission(('CAN_EDIT_PERMISSION'))) {
+                    if (hasPermission(('CAN_ADD_PERMISSION'))) {
                         ?>
                         <div id="actions-btn" class="row">
                             <button class="btn-info" onclick="openAddDialog()">Assign New Permission</button>

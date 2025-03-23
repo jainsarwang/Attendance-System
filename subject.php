@@ -61,7 +61,6 @@ if (strtolower($_SERVER['REQUEST_METHOD']) == 'post' || strtolower($_SERVER['REQ
             'message' => 'Subject Details Updated'
         ]));
     }
-    die();
 
 } else if (strtolower($_SERVER['REQUEST_METHOD']) == 'delete') {
     parse_str(file_get_contents('php://input'), $_REQUEST);
@@ -124,9 +123,15 @@ if (strtolower($_SERVER['REQUEST_METHOD']) == 'post' || strtolower($_SERVER['REQ
 
                     </div>
 
-                    <div id="actions-btn" class="row">
-                        <button class="btn-info" onclick="openAddDialog()">Add New Subject</button>
-                    </div>
+                    <?php
+                    if (hasPermission(('CAN_ADD_SUBJECT'))) {
+                        ?>
+                        <div id="actions-btn" class="row">
+                            <button class="btn-info" onclick="openAddDialog()">Add New Subject</button>
+                        </div>
+                        <?php
+                    }
+                    ?>
 
                     <dialog class="add-dialog" tabindex="-1" onclose="closeDialog(event, true)">
                         <div class="close" onclick="this.closest('dialog').close()">&times;</div>
@@ -187,66 +192,88 @@ if (strtolower($_SERVER['REQUEST_METHOD']) == 'post' || strtolower($_SERVER['REQ
                         </div>
                     </dialog>
 
-                    <div class="table-record">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>S. No.</th>
-                                    <th>Subject Code</th>
-                                    <th>Subject Name</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
+                    <?php
+                    if (hasPermission('CAN_SEE_ALL_SUBJECTS')) {
+                        ?>
 
-                                <?php
-                                $query = mysqli_query($con, "SELECT * FROM subject ORDER BY subject_code ASC");
-                                if (mysqli_num_rows($query) > 0) {
-                                    while ($row = mysqli_fetch_array($query)) {
+                        <div class="table-record">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>S. No.</th>
+                                        <th>Subject Code</th>
+                                        <th>Subject Name</th>
+                                        <?php
+                                        if (hasPermission('CAN_EDIT_SUBJECT'))
+                                            echo '<th>Actions</th>';
+                                        ?>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    <?php
+                                    $query = mysqli_query($con, "SELECT * FROM subject ORDER BY subject_code ASC");
+                                    if (mysqli_num_rows($query) > 0) {
+                                        while ($row = mysqli_fetch_array($query)) {
+                                            ?>
+                                            <tr>
+                                                <td class="count"></td>
+                                                <td>
+                                                    <?= $row['subject_code'] ?>
+                                                </td>
+                                                <td>
+                                                    <?= $row['name'] ?>
+
+                                                </td>
+
+                                                <?php
+                                                if (hasPermission('CAN_EDIT_SUBJECT')) {
+                                                    ?>
+                                                    <td class="actions">
+                                                        <button class="btn-primary" onclick='
+                                                        openEditDialog(
+                                                            `<?= json_encode([
+                                                                'subject_code' => $row['subject_code'],
+                                                                'name' => $row['name']
+                                                            ]) ?>`
+                                                        )
+                                                        '>Edit</button>
+
+                                                        <button class="btn-danger" onclick='
+                                                        deleteData(
+                                                            event,
+                                                            `<?= $_SERVER['PHP_SELF'] ?>`,
+                                                            `<?= json_encode(['subject_code' => $row['subject_code']]) ?>`,
+                                                            `tr`
+                                                        )
+                                                        '>Delete</button>
+                                                    </td>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </tr>
+                                            <?php
+                                        }
+                                    } else {
                                         ?>
                                         <tr>
-                                            <td class="count"></td>
-                                            <td>
-                                                <?= $row['subject_code'] ?>
-                                            </td>
-                                            <td>
-                                                <?= $row['name'] ?>
-
-                                            </td>
-                                            <td class="actions">
-                                                <button class="btn-primary" onclick='
-                                                    openEditDialog(
-                                                        `<?= json_encode([
-                                                            'subject_code' => $row['subject_code'],
-                                                            'name' => $row['name']
-                                                        ]) ?>`
-                                                    )
-                                                '>Edit</button>
-                                                <button class="btn-danger" onclick='
-                                                    deleteData(
-                                                        event,
-                                                        `<?= $_SERVER['PHP_SELF'] ?>`,
-                                                        `<?= json_encode(['subject_code' => $row['subject_code']]) ?>`,
-                                                        `tr`
-                                                    )
-                                                '>Delete</button>
-
-                                            </td>
+                                            <td class="error" colspan="6">No Records Available!!</td>
                                         </tr>
                                         <?php
                                     }
-                                } else {
                                     ?>
-                                    <tr>
-                                        <td class="error" colspan="6">No Records Available!!</td>
-                                    </tr>
-                                    <?php
-                                }
-                                ?>
-                            </tbody>
+                                </tbody>
 
-                        </table>
-                    </div>
+                            </table>
+                        </div>
+
+                        <?php
+                    } else {
+                        ?>
+                        <div class="error">Don't have Permissions to View Records</div>
+                        <?php
+                    }
+                    ?>
 
                 </div>
 

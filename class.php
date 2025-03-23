@@ -146,9 +146,15 @@ if (isset($_GET['class'])) {
 
                     </div>
 
-                    <div id="actions-btn" class="row">
-                        <button class="btn-info" onclick="openAddDialog()">Add New Class</button>
-                    </div>
+                    <?php
+                    if (hasPermission(('CAN_ADD_CLASS'))) {
+                        ?>
+                        <div id="actions-btn" class="row">
+                            <button class="btn-info" onclick="openAddDialog()">Add New Class</button>
+                        </div>
+                        <?php
+                    }
+                    ?>
 
                     <dialog class="add-dialog" tabindex="-1" onclose="closeDialog(event, true)">
                         <div class="close" onclick="this.closest('dialog').close()">&times;</div>
@@ -236,80 +242,100 @@ if (isset($_GET['class'])) {
                         </div>
                     </dialog>
 
-                    <div class="table-record">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>S. No.</th>
-                                    <th>Batch</th>
-                                    <th>semester</th>
-                                    <th>Total Students</th>
-                                    <th>Semester Starting</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
+                    <?php
+                    if (hasPermission('CAN_SEE_ALL_CLASSES')) {
+                        ?>
+                        <div class="table-record">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>S. No.</th>
+                                        <th>Batch</th>
+                                        <th>semester</th>
+                                        <th>Total Students</th>
+                                        <th>Semester Starting</th>
+                                        <?php
+                                        if (hasPermission('CAN_EDIT_CLASS')) {
+                                            ?>
+                                            <th>Actions</th>
+                                            <?php
+                                        }
+                                        ?>
+                                    </tr>
+                                </thead>
+                                <tbody>
 
-                                <?php
-                                $query = mysqli_query($con, "SELECT c.id, c.batch, c.department, c.semester, count(s.class_id) as total_students, c.sem_start FROM classes c LEFT join students s on c.id = s.class_id GROUP BY c.id ORDER BY batch ASC");
-                                if (mysqli_num_rows($query) > 0) {
-                                    while ($row = mysqli_fetch_array($query)) {
+                                    <?php
+                                    $query = mysqli_query($con, "SELECT c.id, c.batch, c.department, c.semester, count(s.class_id) as total_students, c.sem_start FROM classes c LEFT join students s on c.id = s.class_id GROUP BY c.id ORDER BY batch ASC");
+                                    if (mysqli_num_rows($query) > 0) {
+                                        while ($row = mysqli_fetch_array($query)) {
+                                            ?>
+                                            <tr>
+
+                                                <td class="count"></td>
+                                                <td>
+                                                    <?= $row['batch'] ?>
+                                                </td>
+                                                <td>
+                                                    <?= $row['semester'] ?>
+                                                </td>
+                                                <td>
+                                                    <?= $row['total_students'] ?>
+                                                </td>
+                                                <td>
+                                                    <?= date('d M Y', strtotime($row['sem_start'])) ?>
+                                                </td>
+
+                                                <?php
+                                                if (hasPermission('CAN_EDIT_CLASS')) {
+                                                    ?>
+                                                    <td class="actions">
+                                                        <button class="btn-primary" onclick='
+                                                        openEditDialog(
+                                                            `<?= json_encode([
+                                                                'id' => $row['id'],
+                                                                'batch' => $row['batch'],
+                                                                'department' => $row['department'],
+                                                                'semester' => $row['semester'],
+                                                                'sem_start' => $row['sem_start']
+                                                            ]) ?>`
+                                                        )
+                                                        '>Edit</button>
+
+                                                        <button class="btn-danger" onclick='
+                                                        deleteData(
+                                                            event,
+                                                            `<?= $_SERVER['PHP_SELF'] ?>`,
+                                                            `<?= json_encode(['id' => $row['id']]) ?>`,
+                                                            `tr`
+                                                        )
+                                                        '>Delete</button>
+                                                    </td>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </tr>
+                                            <?php
+                                        }
+                                    } else {
                                         ?>
                                         <tr>
-                                            
-                                        <td class="count"></td>
-                                            <td>
-                                                <?= $row['batch'] ?>
-                                            </td>
-                                            <td>
-                                                <?= $row['semester'] ?>
-                                            </td>
-                                            <td>
-                                                <?= $row['total_students'] ?>
-                                            </td>
-                                            <td>
-                                                <?= date('d M Y', strtotime($row['sem_start'])) ?>
-                                            </td>
-
-
-                                            <td class="actions">
-                                                <button class="btn-primary" onclick='
-                                                    openEditDialog(
-                                                        `<?= json_encode([
-                                                            'id' => $row['id'],
-                                                            'batch' => $row['batch'],
-                                                            'department' => $row['department'],
-                                                            'semester' => $row['semester'],
-                                                            'sem_start' => $row['sem_start']
-                                                        ]) ?>`
-                                                    )
-                                                '>Edit</button>
-                                                <button class="btn-danger" onclick='
-                                                    deleteData(
-                                                        event,
-                                                        `<?= $_SERVER['PHP_SELF'] ?>`,
-                                                        `<?= json_encode(['id' => $row['id']]) ?>`,
-                                                        `tr`
-                                                    )
-                                                '>Delete</button>
-
-                                            </td>
+                                            <td class="error" colspan="7">No Records Available!!</td>
                                         </tr>
                                         <?php
                                     }
-                                } else {
                                     ?>
-                                    <tr>
-                                        <td class="error" colspan="7">No Records Available!!</td>
-                                    </tr>
-                                    <?php
-                                }
-                                ?>
-                            </tbody>
+                                </tbody>
 
-                        </table>
-                    </div>
-
+                            </table>
+                        </div>
+                        <?php
+                    } else {
+                        ?>
+                        <div class="error">Don't have Permissions to View Records</div>
+                        <?php
+                    }
+                    ?>
                 </div>
 
             </div>

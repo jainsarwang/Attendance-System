@@ -201,10 +201,15 @@ if (isset ($_GET['subject'])) {
                         </div>
 
                     </div>
-
-                    <div id="actions-btn" class="row">
-                        <button class="btn-info" onclick="openAddDialog()">Add New Lecture</button>
-                    </div>
+                    <?php
+                    if (hasPermission(('CAN_ADD_LECTURE'))) {
+                        ?>
+                        <div id="actions-btn" class="row">
+                            <button class="btn-info" onclick="openAddDialog()">Add New Lecture</button>
+                        </div>
+                        <?php
+                    }
+                    ?>
 
                     <dialog class="add-dialog" tabindex="-1" onclose="closeDialog(event, true)">
                     <div class="close" onclick="this.closest('dialog').close()">&times;</div>
@@ -354,99 +359,122 @@ if (isset ($_GET['subject'])) {
                         </div>
                     </dialog>
 
-                    <div class="table-record">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>S. No.</th>
-                                    <th>Faculty</th>
-                                    <th>Class</th>
-                                    <th>Subject</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php
-                                $queryData = [];
-                                if (!empty ($faculty_id)) {
-                                    $queryData[] = "l.teacher_id = '$faculty_id'";
-                                }
-                                if (!empty ($class_id)) {
-                                    $queryData[] = "l.class_id = '$class_id'";
-                                }
-                                if (!empty ($subject_code)) {
-                                    $queryData[] = "l.subject_id = '$subject_code'";
-                                }
-
-                                if(count($queryData) > 0) $queryData = "WHERE " . implode(" AND ", $queryData);
-                                else $queryData = '';
-
-                                $query = mysqli_query($con, "
-                                    SELECT 
-                                        l.id, 
-                                        l.teacher_id as faculty_id, t.name as faculty, 
-                                        l.class_id, c.batch, c.department, c.semester,
-                                        s.subject_code, s.name as subject
-                                    FROM 
-                                    teaches l INNER JOIN subject s INNER JOIN classes c INNER JOIN users t 
-                                    on l.subject_id = s.subject_code AND l.class_id = c.id AND l.teacher_id = t.id
-                                    $queryData 
-                                    ORDER BY t.name ASC");
-
-                                if (mysqli_num_rows($query) > 0) {
-                                    while ($row = mysqli_fetch_array($query)) {
+                    <?php
+                    if (hasPermission('CAN_SEE_ALL_LECTURES')) {
+                        ?>
+                        <div class="table-record">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>S. No.</th>
+                                        <th>Faculty</th>
+                                        <th>Class</th>
+                                        <th>Subject</th>
+                                        <?php
+                                        if (hasPermission('CAN_EDIT_LECTURE')) {
+                                            ?>
+                                            <th>Actions</th>
+                                            <?php
+                                            }
                                         ?>
-                                                <tr>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    $queryData = [];
+                                    if (!empty ($faculty_id)) 
+                                        $queryData[] = "l.teacher_id = '$faculty_id'";
+                                    
+                                    if (!empty ($class_id)) 
+                                        $queryData[] = "l.class_id = '$class_id'";
+                                    
+                                    if (!empty ($subject_code)) 
+                                        $queryData[] = "l.subject_id = '$subject_code'";
+                                    
+
+                                    if(count($queryData) > 0) 
+                                        $queryData = "WHERE " . implode(" AND ", $queryData);
+                                    else 
+                                        $queryData = '';
+
+                                    $query = mysqli_query($con, "
+                                        SELECT 
+                                            l.id, 
+                                            l.teacher_id as faculty_id, t.name as faculty, 
+                                            l.class_id, c.batch, c.department, c.semester,
+                                            s.subject_code, s.name as subject
+                                        FROM 
+                                        teaches l INNER JOIN subject s INNER JOIN classes c INNER JOIN users t 
+                                        on l.subject_id = s.subject_code AND l.class_id = c.id AND l.teacher_id = t.id
+                                        $queryData 
+                                        ORDER BY t.name ASC");
+
+                                    if (mysqli_num_rows($query) > 0) {
+                                        while ($row = mysqli_fetch_array($query)) {
+                                            ?>
+                                            <tr>
                                                 <td class="count"></td>
-                                                    <td>
-                                                        <?= $row['faculty'] ?>
-                                                    </td>
-                                                    <td>
-                                                        <?= $row['semester'] ?> Semester (Batch
-                                                        <?= $row['batch'] ?>)
-                                                    </td>
-                                                    <td>
-                                                        <?= $row['subject'] ?>
-                                                        (
-                                                        <?= $row['subject_code'] ?> )
-                                                    </td>
+                                                <td>
+                                                    <?= $row['faculty'] ?>
+                                                </td>
+                                                <td>
+                                                    <?= $row['semester'] ?> Semester (Batch
+                                                    <?= $row['batch'] ?>)
+                                                </td>
+                                                <td>
+                                                    <?= $row['subject'] ?>
+                                                    ( <?= $row['subject_code'] ?> )
+                                                </td>
+
+                                                <?php
+                                                if (hasPermission('CAN_EDIT_LECTURE')) {
+                                                    ?>
                                                     <td class="actions">
                                                         <button class="btn-primary" onclick='
-                                                    openEditDialog(
-                                                        `<?= json_encode([
-                                                            'id' => $row['id'],
-                                                            'faculty' => $row['faculty_id'],
-                                                            'class' => $row['class_id'],
-                                                            'subject' => $row['subject_code']
-                                                        ]) ?>`
-                                                    )
-                                                '>Edit</button>
+                                                            openEditDialog(
+                                                                `<?= json_encode([
+                                                                    'id' => $row['id'],
+                                                                    'faculty' => $row['faculty_id'],
+                                                                    'class' => $row['class_id'],
+                                                                    'subject' => $row['subject_code']
+                                                                ]) ?>`
+                                                            )
+                                                        '>Edit</button>
+
                                                         <button class="btn-danger" onclick='
-                                                    deleteData(
-                                                        event,
-                                                        `<?= $_SERVER['PHP_SELF'] ?>`,
-                                                        `<?= json_encode(['id' => $row['id']]) ?>`,
-                                                        `tr`
-                                                    )
-                                                '>Delete</button>
-
+                                                            deleteData(
+                                                                event,
+                                                                `<?= $_SERVER['PHP_SELF'] ?>`,
+                                                                `<?= json_encode(['id' => $row['id']]) ?>`,
+                                                                `tr`
+                                                            )
+                                                        '>Delete</button>
                                                     </td>
-                                                </tr>
-                                                <?php
+
+                                                    <?php
+                                                }
+                                                ?>
+                                            </tr>
+                                            <?php
+                                        }
+                                    } else {
+                                        ?>
+                                            <tr>
+                                                <td class="error" colspan="6">No Records Available!!</td>
+                                            </tr>
+                                            <?php
                                     }
-                                } else {
                                     ?>
-                                        <tr>
-                                            <td class="error" colspan="6">No Records Available!!</td>
-                                        </tr>
-                                        <?php
-                                }
-                                ?>
-                            </tbody>
-
-                        </table>
-                    </div>
-
+                                </tbody>
+                            </table>
+                        </div>
+                        <?php
+                    } else {
+                        ?>
+                        <div class="error">Don't have Permissions to View Records</div>
+                        <?php
+                    }
+                    ?>
                 </div>
 
             </div>

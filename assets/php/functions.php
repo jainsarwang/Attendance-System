@@ -126,7 +126,7 @@ function getUserClassSubject($classId = '', $subjectCode = '')
     global $userData, $con;
 
     $queryData = [];
-    if (in_array(CAN_SEE_ALL_CLASS, $userData["permissions"]) && in_array(CAN_SEE_ALL_SUBJECT, $userData["permissions"])) {
+    if (hasPermission('CAN_SEE_ALL_CLASS') && hasPermission('CAN_SEE_ALL_SUBJECT')) {
 
     } else {
         $queryData[] = "teaches.teacher_id = '" . $userData['id'] . "'";

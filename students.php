@@ -74,7 +74,6 @@ if (strtolower($_SERVER['REQUEST_METHOD']) == 'post' || strtolower($_SERVER['REQ
             'message' => 'Student Details Updated'
         ]));
     }
-    die();
 
 } else if (strtolower($_SERVER['REQUEST_METHOD']) == 'delete') {
     parse_str(file_get_contents('php://input'), $_REQUEST);
@@ -165,9 +164,15 @@ if (isset($_GET['class'])) {
 
                     </div>
 
-                    <div id="actions-btn" class="row">
-                        <button class="btn-info" onclick="openAddDialog()">Add New Student</button>
-                    </div>
+                    <?php
+                    if (hasPermission(('CAN_ADD_STUDENT'))) {
+                        ?>
+                        <div id="actions-btn" class="row">
+                            <button class="btn-info" onclick="openAddDialog()">Add New Student</button>
+                        </div>
+                        <?php
+                    }
+                    ?>
 
                     <dialog class="add-dialog" tabindex="-1" onclose="closeDialog(event, true)">
                         <div class="close" onclick="this.closest('dialog').close()">&times;</div>
@@ -300,49 +305,61 @@ if (isset($_GET['class'])) {
                         </div>
                     </dialog>
 
-                    <div class="table-record">
-
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>S. No.</th>
-                                    <th>Enrollment Number</th>
-                                    <th>Student Name</th>
-                                    <th>Gender</th>
-                                    <th>Mobile</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-
-                                <?php
-                                $queryData = '';
-                                if (!empty($class_id)) {
-                                    $queryData .= "WHERE class_id = '$class_id'";
-                                }
-                                $query = mysqli_query($con, "SELECT * FROM students $queryData ORDER BY enrollment_number ASC");
-                                if (mysqli_num_rows($query) > 0) {
-                                    while ($row = mysqli_fetch_array($query)) {
+                    <?php
+                    if (hasPermission('CAN_SEE_ALL_STUDENTS')) {
+                        ?>
+                        <div class="table-record">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>S. No.</th>
+                                        <th>Enrollment Number</th>
+                                        <th>Student Name</th>
+                                        <th>Gender</th>
+                                        <th>Mobile</th>
+                                        <?php
+                                        if (hasPermission('CAN_EDIT_STUDENT')) {
+                                            ?>
+                                            <th>Actions</th>
+                                            <?php
+                                        }
                                         ?>
-                                        <tr>
-                                            <td class="count"></td>
-                                            <td>
-                                                <?= $row['enrollment_number'] ?>
-                                            </td>
-                                            <td>
-                                                <?= $row['name'] ?>
+                                    </tr>
+                                </thead>
+                                <tbody>
 
-                                            </td>
-                                            <td>
-                                                <?= $row['gender'] ?>
+                                    <?php
+                                    $queryData = '';
+                                    if (!empty($class_id)) {
+                                        $queryData .= "WHERE class_id = '$class_id'";
+                                    }
+                                    $query = mysqli_query($con, "SELECT * FROM students $queryData ORDER BY enrollment_number ASC");
+                                    if (mysqli_num_rows($query) > 0) {
+                                        while ($row = mysqli_fetch_array($query)) {
+                                            ?>
+                                            <tr>
+                                                <td class="count"></td>
+                                                <td>
+                                                    <?= $row['enrollment_number'] ?>
+                                                </td>
+                                                <td>
+                                                    <?= $row['name'] ?>
 
-                                            </td>
-                                            <td>
-                                                <?= $row['mobile'] ?>
+                                                </td>
+                                                <td>
+                                                    <?= $row['gender'] ?>
 
-                                            </td>
-                                            <td class="actions">
-                                                <button class="btn-primary" onclick='
+                                                </td>
+                                                <td>
+                                                    <?= $row['mobile'] ?>
+
+                                                </td>
+
+                                                <?php
+                                                if (hasPermission('CAN_EDIT_STUDENT')) {
+                                                    ?>
+                                                    <td class="actions">
+                                                        <button class="btn-primary" onclick='
                                                     openEditDialog(
                                                         `<?= json_encode([
                                                             'enrollment' => $row['enrollment_number'],
@@ -353,7 +370,7 @@ if (isset($_GET['class'])) {
                                                         ]) ?>`
                                                     )
                                                 '>Edit</button>
-                                                <button class="btn-danger" onclick='
+                                                        <button class="btn-danger" onclick='
                                                     deleteData(
                                                         event,
                                                         `<?= $_SERVER['PHP_SELF'] ?>`,
@@ -362,23 +379,33 @@ if (isset($_GET['class'])) {
                                                     )
                                                 '>Delete</button>
 
-                                            </td>
+                                                    </td>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </tr>
+                                            <?php
+                                        }
+                                    } else {
+                                        ?>
+                                        <tr>
+                                            <td class="error" colspan="6">No Records Available!!</td>
                                         </tr>
                                         <?php
                                     }
-                                } else {
                                     ?>
-                                    <tr>
-                                        <td class="error" colspan="6">No Records Available!!</td>
-                                    </tr>
-                                    <?php
-                                }
-                                ?>
-                            </tbody>
+                                </tbody>
 
-                        </table>
-                    </div>
+                            </table>
+                        </div>
 
+                        <?php
+                    } else {
+                        ?>
+                        <div class="error">Don't have Permissions to View Records</div>
+                        <?php
+                    }
+                    ?>
                 </div>
 
             </div>

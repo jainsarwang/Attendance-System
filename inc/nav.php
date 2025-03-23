@@ -74,6 +74,7 @@
     <?php
     if (
         hasPermission('CAN_SEE_ALL_PERMISSIONS') ||
+        hasPermission('CAN_ADD_PERMISSION') ||
         hasPermission('CAN_EDIT_PERMISSION')
     ) {
         echo '<li><a href="' . ROOT . 'permissions.php">Permissions</a></li>';

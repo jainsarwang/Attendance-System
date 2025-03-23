@@ -125,8 +125,6 @@ if (strtolower($_SERVER['REQUEST_METHOD']) == 'post' || strtolower($_SERVER['REQ
         ]));
     }
 
-    die();
-
 } else if (strtolower($_SERVER['REQUEST_METHOD']) == 'delete') {
     parse_str(file_get_contents('php://input'), $_REQUEST);
 
@@ -192,9 +190,15 @@ if (isset($_GET['class'])) {
 
                     </div>
 
-                    <div id="actions-btn" class="row">
-                        <button class="btn-info" onclick="openAddDialog()">Add New Member</button>
-                    </div>
+                    <?php
+                    if (hasPermission(('CAN_ADD_MEMBER'))) {
+                        ?>
+                        <div id="actions-btn" class="row">
+                            <button class="btn-info" onclick="openAddDialog()">Add New Member</button>
+                        </div>
+                        <?php
+                    }
+                    ?>
 
                     <dialog class="add-dialog" tabindex="-1" onclose="closeDialog(event, true)">
                         <div class="close" onclick="this.closest('dialog').close()">&times;</div>
@@ -315,83 +319,104 @@ if (isset($_GET['class'])) {
                         </div>
                     </dialog>
 
-                    <div class="table-record">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>S. No.</th>
-                                    <th>Name</th>
-                                    <th>Username</th>
-                                    <th>Mobile</th>
-                                    <th>Type</th>
-                                    <th>Role</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
+                    <?php
+                    if (hasPermission('CAN_SEE_ALL_MEMBERS')) {
+                        ?>
+                        <div class="table-record">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>S. No.</th>
+                                        <th>Name</th>
+                                        <th>Username</th>
+                                        <th>Mobile</th>
+                                        <th>Type</th>
+                                        <th>Role</th>
+                                        <?php
+                                        if (hasPermission('CAN_EDIT_MEMBER')) {
+                                            ?>
+                                            <th>Actions</th>
+                                            <?php
+                                        }
+                                        ?>
+                                    </tr>
+                                </thead>
+                                <tbody>
 
-                                <?php
-                                $query = mysqli_query($con, "SELECT * FROM users WHERE role <> 'hod' ORDER BY name ASC");
+                                    <?php
+                                    $query = mysqli_query($con, "SELECT * FROM users WHERE role <> 'hod' ORDER BY name ASC");
 
-                                if (mysqli_num_rows($query) > 0) {
-                                    while ($row = mysqli_fetch_array($query)) {
+                                    if (mysqli_num_rows($query) > 0) {
+                                        while ($row = mysqli_fetch_array($query)) {
+                                            ?>
+                                            <tr>
+                                                <td class="count"></td>
+                                                <td>
+                                                    <?= $row['name'] ?>
+                                                </td>
+                                                <td>
+                                                    <?= $row['user'] ?>
+
+                                                </td>
+                                                <td>
+                                                    <?= $row['mobile'] ?>
+
+                                                </td>
+                                                <td>
+                                                    <?= $row['type'] ?>
+                                                </td>
+                                                <td>
+                                                    <?= $row['role'] ?>
+                                                </td>
+                                                <?php
+                                                if (hasPermission('CAN_EDIT_MEMBER')) {
+                                                    ?>
+                                                    <td class="actions">
+                                                        <button class="btn-primary" onclick='
+                                                            openEditDialog(
+                                                                `<?= json_encode([
+                                                                    'name' => $row['name'],
+                                                                    'username' => $row['user'],
+                                                                    'mobile' => $row['mobile'],
+                                                                    'type' => $row['type'],
+                                                                    'role' => $row['role'],
+                                                                ]) ?>`
+                                                            )
+                                                        '>Edit</button>
+                                                        <button class="btn-danger" onclick='
+                                                            deleteData(
+                                                                event,
+                                                                `<?= $_SERVER['PHP_SELF'] ?>`,
+                                                                `<?= json_encode(['user' => $row['user']]) ?>`,
+                                                                `tr`
+                                                            )
+                                                        '>Delete</button>
+                                                        <?php
+                                                }
+                                                ?>
+                                                </td>
+                                            </tr>
+                                            <?php
+                                        }
+                                    } else {
                                         ?>
                                         <tr>
-                                            <td class="count"></td>
-                                            <td>
-                                                <?= $row['name'] ?>
-                                            </td>
-                                            <td>
-                                                <?= $row['user'] ?>
-
-                                            </td>
-                                            <td>
-                                                <?= $row['mobile'] ?>
-
-                                            </td>
-                                            <td>
-                                                <?= $row['type'] ?>
-                                            </td>
-                                            <td>
-                                                <?= $row['role'] ?>
-                                            </td>
-                                            <td class="actions">
-                                                <button class="btn-primary" onclick='
-                                                    openEditDialog(
-                                                        `<?= json_encode([
-                                                            'name' => $row['name'],
-                                                            'username' => $row['user'],
-                                                            'mobile' => $row['mobile'],
-                                                            'type' => $row['type'],
-                                                            'role' => $row['role'],
-                                                        ]) ?>`
-                                                    )
-                                                '>Edit</button>
-                                                <button class="btn-danger" onclick='
-                                                    deleteData(
-                                                        event,
-                                                        `<?= $_SERVER['PHP_SELF'] ?>`,
-                                                        `<?= json_encode(['user' => $row['user']]) ?>`,
-                                                        `tr`
-                                                    )
-                                                '>Delete</button>
-
-                                            </td>
+                                            <td class="error" colspan="7">No Records Available!!</td>
                                         </tr>
                                         <?php
                                     }
-                                } else {
                                     ?>
-                                    <tr>
-                                        <td class="error" colspan="7">No Records Available!!</td>
-                                    </tr>
-                                    <?php
-                                }
-                                ?>
-                            </tbody>
+                                </tbody>
 
-                        </table>
-                    </div>
+                            </table>
+                        </div>
+                        <?php
+                    } else {
+                        ?>
+                        <div class="error">Don't have Permissions to View Records</div>
+                        <?php
+                    }
+                    ?>
 
                 </div>
 
