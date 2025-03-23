@@ -1,7 +1,13 @@
 <?php
-use LucianoTonet\GroqPHP\Groq;
-
 require_once "../assets/php/config.php";
+
+if (!class_exists("LucianoTonet\GroqPHP\Groq", true)) {
+    // groq now found 
+    echo "ERROR: groq class not exists";
+
+    return;
+}
+
 
 class GenAI
 {
@@ -26,7 +32,7 @@ class GenAI
         $this->_api_key = $api_key;
         // Instantiate the Groq client. You'll need to adapt this based on the actual PHP library.
         // Assuming a hypothetical Groq PHP client:
-        $this->_ai_client = new Groq(
+        $this->_ai_client = new LucianoTonet\GroqPHP\Groq(
             $api_key,
             [
                 'baseUrl' => 'https://api.groq.com/openai/v1'

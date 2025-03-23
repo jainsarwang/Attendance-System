@@ -1,20 +1,31 @@
 <?php
-# importin gautoloader
-require_once(__DIR__ . '/../../vendor/autoload.php');
+$autoloaderPath = __DIR__ . '/../../vendor/autoload.php';
+if (file_exists($autoloaderPath)) {
+    include_once $autoloaderPath;
+}
 
-# importing ENV variable
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../../');
-$dotenv->load();
+// importing env variables
+if (class_exists("Dotenv\Dotenv", true)) {
+    $dotenvPath = __DIR__ . '/../../';
+    $dotenv = Dotenv\Dotenv::createImmutable($dotenvPath);
+    $dotenv->load();
+}
+// # importin gautoloader
+// include_once(__DIR__ . '/../../vendor/autoload.php');
+
+// # importing ENV variable
+// $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../../');
+// $dotenv->load();
 
 session_start();
 # GROQ api
 define('GROQ_API_KEY', $_ENV['GROQ_API_KEY'] ?? '');
 
 # Mysql connection
-define('HOST', $_ENV['MYSQL_HOST'] ?? '');
-define('USER', $_ENV['MYSQL_USER'] ?? '');
+define('HOST', $_ENV['MYSQL_HOST'] ?? 'localhost');
+define('USER', $_ENV['MYSQL_USER'] ?? 'root');
 define('PASSWORD', $_ENV['MYSQL_PASS'] ?? '');
-define('DATABASE', $_ENV['MYSQL_DB'] ?? '');
+define('DATABASE', $_ENV['MYSQL_DB'] ?? 'attendance_system');
 
 # default app name
 define('APP_NAME', 'Attendance System');
