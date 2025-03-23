@@ -332,14 +332,12 @@ if (isset($_GET['class'])) {
 
                                 <?php
                                 $query = mysqli_query($con, "SELECT * FROM users WHERE role <> 'hod' ORDER BY name ASC");
-                                $count = 1;
+
                                 if (mysqli_num_rows($query) > 0) {
                                     while ($row = mysqli_fetch_array($query)) {
                                         ?>
                                         <tr>
-                                            <td>
-                                                <?= $count++ ?>
-                                            </td>
+                                            <td class="count"></td>
                                             <td>
                                                 <?= $row['name'] ?>
                                             </td>

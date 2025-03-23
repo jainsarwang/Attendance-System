@@ -317,13 +317,10 @@ $userSubject = getUserSubjects();
                                                     <?php
                                                     $query = mysqli_query($con, "SELECT * FROM students WHERE students.class_id = '$class_id'");
                                                     if (mysqli_num_rows($query) > 0) {
-                                                        $count = 1;
                                                         while ($row = mysqli_fetch_assoc($query)) {
                                                             ?>
                                                             <tr tabindex="0 ">
-                                                                <td>
-                                                                    <?= $count++ ?>
-                                                                </td>
+                                                                <td class="count"></td>
                                                                 <td>
                                                                     <?= $row['enrollment_number'] ?>
                                                                 </td>
@@ -586,14 +583,10 @@ $userSubject = getUserSubjects();
                                     SUM(CASE WHEN attendances.status = 'P' THEN 1 ELSE 0 END) as total_presents, SUM(CASE WHEN attendances.status = 'A' THEN 1 ELSE 0 END) as total_absents, count(attendances.status) as total_attendance,
                                     students.enrollment_number as enrollment, students.name as student_name -->
                                     <?php
-                                    $count = 1;
-                                    echo "<pre>";
                                     foreach ($attendance_record as $row) {
                                         ?>
                                         <tr>
-                                            <td>
-                                                <?= $count++ ?>
-                                            </td>
+                                            <td class="count"></td>
                                             <td>
                                                 <?= $row['enrollment'] ?>
                                             </td>

@@ -201,14 +201,11 @@ if (strtolower($_SERVER['REQUEST_METHOD']) == 'post' || strtolower($_SERVER['REQ
 
                                 <?php
                                 $query = mysqli_query($con, "SELECT * FROM subject ORDER BY subject_code ASC");
-                                $count = 1;
                                 if (mysqli_num_rows($query) > 0) {
                                     while ($row = mysqli_fetch_array($query)) {
                                         ?>
                                         <tr>
-                                            <td>
-                                                <?= $count++ ?>
-                                            </td>
+                                            <td class="count"></td>
                                             <td>
                                                 <?= $row['subject_code'] ?>
                                             </td>

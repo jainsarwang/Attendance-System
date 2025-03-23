@@ -252,14 +252,12 @@ if (isset($_GET['class'])) {
 
                                 <?php
                                 $query = mysqli_query($con, "SELECT c.id, c.batch, c.department, c.semester, count(s.class_id) as total_students, c.sem_start FROM classes c LEFT join students s on c.id = s.class_id GROUP BY c.id ORDER BY batch ASC");
-                                $count = 1;
                                 if (mysqli_num_rows($query) > 0) {
                                     while ($row = mysqli_fetch_array($query)) {
                                         ?>
                                         <tr>
-                                            <td>
-                                                <?= $count++ ?>
-                                            </td>
+                                            
+                                        <td class="count"></td>
                                             <td>
                                                 <?= $row['batch'] ?>
                                             </td>

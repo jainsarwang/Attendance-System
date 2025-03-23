@@ -275,14 +275,10 @@ $userSubject = getUserSubjects();
                                     <tbody>
 
                                         <?php
-                                        $count = 1;
-                                        echo "<pre>";
                                         foreach ($attendance_record as $row) {
                                             ?>
                                             <tr>
-                                                <td>
-                                                    <?= $count++ ?>
-                                                </td>
+                                                <td class="count"></td>
                                                 <td>
                                                     <?= $row['enrollment'] ?>
                                                 </td>
@@ -336,7 +332,6 @@ $userSubject = getUserSubjects();
                                             </tr>
                                             <?php
                                         }
-                                        echo "</pre>";
                                         ?>
                                     </tbody>
 

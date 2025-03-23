@@ -320,6 +320,11 @@ table td {
     position: relative;
 }
 
+table td.count::before {
+    content: counter(serial-num);
+    counter-increment: serial-num;
+}
+
 table td.error {
     column-span: all;
 }

@@ -392,15 +392,12 @@ if (isset ($_GET['subject'])) {
                                     on l.subject_id = s.subject_code AND l.class_id = c.id AND l.teacher_id = t.id
                                     $queryData 
                                     ORDER BY t.name ASC");
-                                $count = 1;
 
                                 if (mysqli_num_rows($query) > 0) {
                                     while ($row = mysqli_fetch_array($query)) {
                                         ?>
                                                 <tr>
-                                                    <td>
-                                                        <?= $count++ ?>
-                                                    </td>
+                                                <td class="count"></td>
                                                     <td>
                                                         <?= $row['faculty'] ?>
                                                     </td>

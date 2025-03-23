@@ -321,14 +321,11 @@ if (isset($_GET['class'])) {
                                     $queryData .= "WHERE class_id = '$class_id'";
                                 }
                                 $query = mysqli_query($con, "SELECT * FROM students $queryData ORDER BY enrollment_number ASC");
-                                $count = 1;
                                 if (mysqli_num_rows($query) > 0) {
                                     while ($row = mysqli_fetch_array($query)) {
                                         ?>
                                         <tr>
-                                            <td>
-                                                <?= $count++ ?>
-                                            </td>
+                                            <td class="count"></td>
                                             <td>
                                                 <?= $row['enrollment_number'] ?>
                                             </td>

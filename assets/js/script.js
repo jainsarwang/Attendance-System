@@ -49,6 +49,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 				if (res.ok) {
 					msg.classList.add("success");
+					form.reset();
 				} else {
 					// except from 2xx response
 					msg.classList.remove("success");
