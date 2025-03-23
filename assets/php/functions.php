@@ -84,20 +84,24 @@ function getUserClasses()
     global $userData, $con;
 
     $queryData = [];
-    if (hasPermission("CAN_SEE_ALL_CLASS")) {
+    if (hasPermission("CAN_SEE_ALL_CLASSES")) {
 
-    } else {
-        $queryData[] = "teaches.teacher_id = '" . $userData['id'] . "'";
+    } else if (hasPermission('CAN_SEE_CLASS')) {
+
+        if (isset($userData['role']) && $userData['role'] != 'student')
+            $queryData[] = "faculty_id = '" . $userData['id'] . "'";
+        else
+            $queryData[] = "enrollment_number = '" . $userData['enrollment_number'] . "'";
     }
 
     $queryData = constructQueryData($queryData);
 
-    $query = mysqli_query($con, "SELECT classes.* FROM teaches RIGHT JOIN classes ON teaches.class_id = classes.id $queryData GROUP BY classes.id");
+    if (isset($userData['role']) && $userData['role'] != 'student')
+        $query = mysqli_query($con, "SELECT classes.* FROM teaches RIGHT JOIN classes ON teaches.class_id = classes.id $queryData GROUP BY classes.id");
+    else
+        $query = mysqli_query($con, "SELECT classes.* FROM classes JOIN students ON classes.id = students.class_id $queryData GROUP BY classes.id");
 
-    $classes = [];
-    while ($row = mysqli_fetch_assoc($query))
-        $classes[] = $row;
-    return $classes;
+    return $query;
 }
 
 function getUserSubjects()
@@ -105,20 +109,23 @@ function getUserSubjects()
     global $userData, $con;
 
     $queryData = [];
-    if (hasPermission('CAN_SEE_ALL_SUBJECT')) {
+    if (hasPermission('CAN_SEE_ALL_SUBJECTS')) {
 
-    } else {
-        $queryData[] = "teaches.teacher_id = '" . $userData['id'] . "'";
+    } else if (hasPermission('CAN_SEE_SUBJECT')) {
+        if (isset($userData['role']) && $userData['role'] != 'student')
+            $queryData[] = "faculty_id = '" . $userData['id'] . "'";
+        else
+            $queryData[] = "enrollment_number = '" . $userData['enrollment_number'] . "'";
     }
 
     $queryData = constructQueryData($queryData);
 
-    $query = mysqli_query($con, "SELECT subject.* FROM teaches RIGHT JOIN subject ON teaches.subject_id = subject.subject_code $queryData  GROUP BY subject.subject_code");
+    if (isset($userData['role']) && $userData['role'] != 'student')
+        $query = mysqli_query($con, "SELECT subject_code, subject as name FROM lectures $queryData GROUP BY subject_code");
+    else
+        $query = mysqli_query($con, "SELECT subject_code, subject as name FROM student_lectures $queryData GROUP BY subject_code");
 
-    $classes = [];
-    while ($row = mysqli_fetch_assoc($query))
-        $classes[] = $row;
-    return $classes;
+    return $query;
 }
 
 function getUserClassSubject($classId = '', $subjectCode = '')
@@ -126,24 +133,51 @@ function getUserClassSubject($classId = '', $subjectCode = '')
     global $userData, $con;
 
     $queryData = [];
-    if (hasPermission('CAN_SEE_ALL_CLASS') && hasPermission('CAN_SEE_ALL_SUBJECT')) {
+    if (hasPermission('CAN_SEE_ALL_CLASSES') && hasPermission('CAN_SEE_ALL_SUBJECTS')) {
 
-    } else {
-        $queryData[] = "teaches.teacher_id = '" . $userData['id'] . "'";
+    } else if (hasPermission('CAN_SEE_CLASS') || hasPermission('CAN_SEE_SUBJECT')) {
+        if (isset($userData['role']) && $userData['role'] != 'student')
+            $queryData[] = "faculty_id = '" . $userData['id'] . "'";
+        else
+            $queryData[] = "enrollment_number = '" . $userData['enrollment_number'] . "'";
     }
 
     if (!empty($classId))
-        $queryData[] = "teaches.class_id = '$classId'";
+        $queryData[] = "class_id = '$classId'";
     if (!empty($subjectCode))
-        $queryData[] = "teaches.subject_id = '$subjectCode'";
+        $queryData[] = "subject_code = '$subjectCode'";
 
     $queryData = constructQueryData($queryData);
 
-    $query = mysqli_query($con, "
-    SELECT teaches.id as teaches_id, subject.subject_code, subject.name as subject_name, classes.id = class_id, classes.department, classes.batch, classes.semester
-    FROM teaches INNER JOIN classes INNER JOIN subject ON teaches.class_id = classes.id AND teaches.subject_id = subject.subject_code $queryData");
+    if (isset($userData['role']) && $userData['role'] != 'student')
+        $query = mysqli_query($con, "
+        SELECT 
+            teaches_id,
+            subject_code,
+            subject as subject_name,
+            faculty_id as teacher_id,
+            class_id,
+            department,
+            batch,
+            semester
+        FROM lectures $queryData 
+        GROUP BY subject_code, class_id");
+    else
+        $query = mysqli_query($con, "
+        SELECT
+            teaches_id,
+            subject_code,
+            subject as subject_name,
+            faculty_id as teacher_id,
+            class_id,
+            department,
+            batch,
+            semester 
+        FROM student_lectures $queryData 
+        GROUP BY subject_code, class_id");
 
-    return getMysqlResultToArray($query);
+
+    return $query;
 }
 
 function getAllPermissions(): bool|mysqli_result
@@ -164,7 +198,7 @@ function formatQueryToStr($str, $query)
     while ($row = mysqli_fetch_assoc($query)) {
         $currentItem = preg_replace_callback_array(
             [
-                '/\{([a-zA-Z0-9]+)\}/' => function ($pattern) use ($row) {
+                '/\{([a-zA-Z0-9_]+)\}/' => function ($pattern) use ($row) {
                     $key = $pattern[1];
 
                     if (array_key_exists($key, $row)) {
@@ -176,10 +210,6 @@ function formatQueryToStr($str, $query)
             ],
             $str,
         );
-
-        print_r($currentItem);
-
-
         $result .= $currentItem;
     }
 
@@ -215,5 +245,20 @@ function processRequestData(...$names)
     }
 
     return $result;
+}
+
+function idIsRequired()
+{
+    global $con;
+
+    if (!isset($_REQUEST['id']) || empty($_REQUEST['id'])) {
+        http_response_code(403);
+        die(json_encode([
+            'status' => 'error',
+            'message' => 'Id is Required'
+        ]));
+    }
+
+    return mysqli_real_escape_string($con, trim($_REQUEST['id']));
 }
 ?>

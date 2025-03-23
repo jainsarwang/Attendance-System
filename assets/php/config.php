@@ -31,7 +31,7 @@ define('DATABASE', $_ENV['MYSQL_DB'] ?? 'attendance_system');
 define('APP_NAME', 'Attendance System');
 
 # For navigating in file system
-define('ROOT', '');
+define('ROOT', '/projects/Attendence_system/');
 define('CSS_DIR', ROOT . 'assets/css/');
 define('JS_DIR', ROOT . 'assets/js/');
 

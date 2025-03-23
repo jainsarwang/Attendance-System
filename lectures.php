@@ -8,30 +8,13 @@ if (strtolower($_SERVER['REQUEST_METHOD']) == 'post' || strtolower($_SERVER['REQ
 
     parse_str(file_get_contents('php://input'), $_REQUEST);
 
-    if (!isset ($_REQUEST['class']) || !isset ($_REQUEST['subject']) || !isset ($_REQUEST['faculty'])) {
-        http_response_code(403);
-        die (json_encode([
-            'status' => 'error',
-            'message' => 'All fields are required'
-        ]));
-    }
+    // getting data to variables
+    $teaches_id = isset ($_REQUEST['teaches_id']) ? $_REQUEST['teaches_id'] : '';
+    [$class, $subject, $faculty] = processRequestData('class', 'subject','faculty');
 
-    $id = isset ($_REQUEST['id']) ? $_REQUEST['id'] : '';
-    $class = mysqli_real_escape_string($con, trim($_REQUEST['class']));
-    $subject = mysqli_real_escape_string($con, trim($_REQUEST['subject']));
-    $faculty = mysqli_real_escape_string($con, trim($_REQUEST['faculty']));
-
-    if (empty ($class) || empty ($subject) || empty ($faculty)) {
-        http_response_code(403);
-        die (json_encode([
-            'status' => 'error',
-            'message' => 'All fields are required'
-        ]));
-    }
-
-    $query = mysqli_query($con, "SELECT * FROM teaches WHERE id = '$id' OR ('$id'= '' AND teacher_id = '$faculty' AND class_id = '$class' AND subject_id = '$subject')");
+    $query = mysqli_query($con, "SELECT * FROM teaches WHERE id = '$teaches_id' OR ('$teaches_id'= '' AND teacher_id = '$faculty' AND class_id = '$class' AND subject_id = '$subject')");
     if (strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
-        // new student detail
+        // new lecture detail
         if (mysqli_num_rows($query) > 0) {
             http_response_code(401);
             die (json_encode([
@@ -40,8 +23,8 @@ if (strtolower($_SERVER['REQUEST_METHOD']) == 'post' || strtolower($_SERVER['REQ
             ]));
         }
 
-        $id = md5($faculty . $class . $subject);
-        $insertValue = "'$id', '$faculty', '$class', '$subject'";
+        $teaches_id = md5($faculty . $class . $subject);
+        $insertValue = "'$teaches_id', '$faculty', '$class', '$subject'";
 
         $query = mysqli_query($con, "INSERT INTO teaches(id, teacher_id, class_id, subject_id) VALUES($insertValue)") or die (mysqli_error($con));
 
@@ -51,7 +34,7 @@ if (strtolower($_SERVER['REQUEST_METHOD']) == 'post' || strtolower($_SERVER['REQ
             'message' => 'Lecture Added'
         ]));
     } else {
-        // upating student detail
+        // upating lecture detail
         if (mysqli_num_rows($query) == 0) {
             http_response_code(401);
             die (json_encode([
@@ -59,28 +42,20 @@ if (strtolower($_SERVER['REQUEST_METHOD']) == 'post' || strtolower($_SERVER['REQ
                 'message' => 'Invalid Id'
             ]));
         }
-        $updateData = "teacher_id = '$faculty', class_id = '$class', subject_id = '$subject'";
 
-        $query = mysqli_query($con, "UPDATE teaches SET $updateData WHERE id = '$id'");
+        $updateData = "teacher_id = '$faculty', class_id = '$class', subject_id = '$subject'";
+        $query = mysqli_query($con, "UPDATE teaches SET $updateData WHERE id = '$teaches_id'");
 
         die (json_encode([
             'status' => 'success',
-            'message' => 'Student Details Updated'
+            'message' => 'Lecture Details Updated'
         ]));
     }
 
 } else if (strtolower($_SERVER['REQUEST_METHOD']) == 'delete') {
     parse_str(file_get_contents('php://input'), $_REQUEST);
 
-    if (!isset ($_REQUEST['id']) || empty ($_REQUEST['id'])) {
-        http_response_code(403);
-        die (json_encode([
-            'status' => 'error',
-            'message' => 'Id is Required'
-        ]));
-    }
-
-    $id = mysqli_real_escape_string($con, trim($_REQUEST['id']));
+    $id = idIsRequired();
 
     $query = mysqli_query($con, "DELETE FROM teaches WHERE id = '$id'");
 
@@ -108,7 +83,7 @@ if (isset ($_GET['subject'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lectures | Attendance System</title>
+    <title>Lectures | <?= APP_NAME ?></title>
 
     <link rel="stylesheet" href="<?= CSS_DIR ?>style.css">
 </head>
@@ -136,6 +111,7 @@ if (isset ($_GET['subject'])) {
 
                                         <?php
                                         $query = mysqli_query($con, "SELECT * FROM users WHERE role = 'faculty' OR role = 'hod' ORDER BY name ASC");
+                                        
                                         while ($row = mysqli_fetch_array($query)) {
                                             ?>
                                             <option value="<?= $row['id'] ?>" <?= $row['id'] == $faculty_id ? 'selected' : '' ?>
@@ -224,13 +200,8 @@ if (isset ($_GET['subject'])) {
 
                                             <?php
                                             $query = mysqli_query($con, "SELECT * FROM users WHERE role = 'faculty' OR role = 'hod' ORDER BY name ASC");
-                                            while ($row = mysqli_fetch_array($query)) {
-                                                ?>
-                                                    <option value="<?= $row['id'] ?>">
-                                                        <?= $row['name'] ?>
-                                                    </option>
-                                                    <?php
-                                            }
+                                            
+                                            echo formatQueryToStr('<option value="{id}">{name}</option>', $query);
                                             ?>
                                         </select>
                                         <label for="faculty">Faculty</label>
@@ -242,14 +213,11 @@ if (isset ($_GET['subject'])) {
 
                                             <?php
                                             $query = mysqli_query($con, "SELECT * FROM classes ORDER BY batch ASC");
-                                            while ($row = mysqli_fetch_array($query)) {
-                                                ?>
-                                                    <option value="<?= $row['id'] ?>">
-                                                        <?= $row['semester'] ?> Semester (Batch
-                                                        <?= $row['batch'] ?>)
-                                                    </option>
-                                                    <?php
-                                            }
+                                            
+                                            echo formatQueryToStr(
+                                                '<option value="{id}">{semester} Semester (Batch {batch])</option>', 
+                                                $query
+                                            );
                                             ?>
                                         </select>
                                         <label for="class">Class</label>
@@ -261,14 +229,11 @@ if (isset ($_GET['subject'])) {
 
                                             <?php
                                             $query = mysqli_query($con, "SELECT * FROM subject ORDER BY name ASC");
-                                            while ($row = mysqli_fetch_array($query)) {
-                                                ?>
-                                                    <option value="<?= $row['subject_code'] ?>">
-                                                        <?= $row['name'] ?> (
-                                                        <?= $row['subject_code'] ?>)
-                                                    </option>
-                                                    <?php
-                                            }
+                                            
+                                            echo formatQueryToStr(
+                                                '<option value="{subject_code}">{name} ({subject_code})</option>',
+                                                $query
+                                            );
                                             ?>
                                         </select>
                                         <label for="subject">Faculty Name</label>
@@ -285,16 +250,16 @@ if (isset ($_GET['subject'])) {
                     </dialog>
 
                     <dialog class="edit-dialog" tabindex="-1" onclose="closeDialog(event, true)">
-                    <div class="close" onclick="this.closest('dialog').close()">&times;</div>
+                        <div class="close" onclick="this.closest('dialog').close()">&times;</div>
                         <div class="title">Edit Student Detail</div>
 
                         <div class="scroll-section center">
                             <div class="form">
                                 <form action="<?= $_SERVER['PHP_SELF'] ?>" method="POST" data-method="put"
                                     autocomplete="off">
-                                    <input type="hidden" name="id">
+                                    <input type="hidden" name="teaches_id">
                                     <div class="form-field">
-                                        <select name="faculty" id="faculty" required>
+                                        <select name="faculty" id="faculty" required value="1">
                                             <option selected disabled value="">Choose faculty</option>
 
                                             <?php
@@ -379,17 +344,18 @@ if (isset ($_GET['subject'])) {
                                         ?>
                                     </tr>
                                 </thead>
+
                                 <tbody>
                                     <?php
                                     $queryData = [];
                                     if (!empty ($faculty_id)) 
-                                        $queryData[] = "l.teacher_id = '$faculty_id'";
+                                        $queryData[] = "faculty_id = '$faculty_id'";
                                     
                                     if (!empty ($class_id)) 
-                                        $queryData[] = "l.class_id = '$class_id'";
+                                        $queryData[] = "class_id = '$class_id'";
                                     
                                     if (!empty ($subject_code)) 
-                                        $queryData[] = "l.subject_id = '$subject_code'";
+                                        $queryData[] = "subject_code = '$subject_code'";
                                     
 
                                     if(count($queryData) > 0) 
@@ -397,73 +363,54 @@ if (isset ($_GET['subject'])) {
                                     else 
                                         $queryData = '';
 
-                                    $query = mysqli_query($con, "
-                                        SELECT 
-                                            l.id, 
-                                            l.teacher_id as faculty_id, t.name as faculty, 
-                                            l.class_id, c.batch, c.department, c.semester,
-                                            s.subject_code, s.name as subject
-                                        FROM 
-                                        teaches l INNER JOIN subject s INNER JOIN classes c INNER JOIN users t 
-                                        on l.subject_id = s.subject_code AND l.class_id = c.id AND l.teacher_id = t.id
-                                        $queryData 
-                                        ORDER BY t.name ASC");
+                                    $format = 
+                                        '<tr>' .
+                                        '<td class="count"></td>' .
+                                        '<td>{faculty}</td>' .
+                                        '<td>{semester} Semester (Batch {batch})</td>' .
+                                        '<td>{subject} ( {subject_code} )</td>' .
+                                        (
+                                            hasPermission('CAN_EDIT_LECTURE') ? (
+                                                '<td class="actions">
+                                                    <button class="btn-primary" onclick=\'
+                                                        openEditDialog(
+                                                            `' . json_encode([
+                                                                'teaches_id' => '{teaches_id}',
+                                                                'faculty' => '{faculty_id}',
+                                                                'class' => '{class_id}',
+                                                                'subject' => '{subject_code}'
+                                                            ]) . '`
+                                                        )
+                                                    \'>Edit</button>
 
-                                    if (mysqli_num_rows($query) > 0) {
-                                        while ($row = mysqli_fetch_array($query)) {
-                                            ?>
-                                            <tr>
-                                                <td class="count"></td>
-                                                <td>
-                                                    <?= $row['faculty'] ?>
-                                                </td>
-                                                <td>
-                                                    <?= $row['semester'] ?> Semester (Batch
-                                                    <?= $row['batch'] ?>)
-                                                </td>
-                                                <td>
-                                                    <?= $row['subject'] ?>
-                                                    ( <?= $row['subject_code'] ?> )
-                                                </td>
+                                                    <button class="btn-danger" onclick=\'
+                                                        deleteData(
+                                                            event,
+                                                            `' . $_SERVER['PHP_SELF'] . '`,
+                                                            `' . json_encode(['id' => '{teaches_id}']) . '`,
+                                                            `tr`
+                                                        )
+                                                    \'>Delete</button>
+                                                </td>'
+                                            ) : ''
+                                        ).
+                                        '</tr>';
 
-                                                <?php
-                                                if (hasPermission('CAN_EDIT_LECTURE')) {
-                                                    ?>
-                                                    <td class="actions">
-                                                        <button class="btn-primary" onclick='
-                                                            openEditDialog(
-                                                                `<?= json_encode([
-                                                                    'id' => $row['id'],
-                                                                    'faculty' => $row['faculty_id'],
-                                                                    'class' => $row['class_id'],
-                                                                    'subject' => $row['subject_code']
-                                                                ]) ?>`
-                                                            )
-                                                        '>Edit</button>
+                                    $query = mysqli_query($con, "SELECT * FROM  lectures $queryData ORDER BY faculty ASC");
 
-                                                        <button class="btn-danger" onclick='
-                                                            deleteData(
-                                                                event,
-                                                                `<?= $_SERVER['PHP_SELF'] ?>`,
-                                                                `<?= json_encode(['id' => $row['id']]) ?>`,
-                                                                `tr`
-                                                            )
-                                                        '>Delete</button>
-                                                    </td>
+                                    $records = formatQueryToStr(
+                                        $format,
+                                        $query
+                                    );
 
-                                                    <?php
-                                                }
-                                                ?>
-                                            </tr>
-                                            <?php
-                                        }
-                                    } else {
+                                    if(empty($records)) {
                                         ?>
-                                            <tr>
-                                                <td class="error" colspan="6">No Records Available!!</td>
-                                            </tr>
-                                            <?php
-                                    }
+                                        <tr>
+                                            <td class="error" colspan="6">No Records Available!!</td>
+                                        </tr>
+                                        <?php
+                                    }else
+                                        echo $records;
                                     ?>
                                 </tbody>
                             </table>

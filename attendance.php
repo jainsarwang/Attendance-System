@@ -138,8 +138,8 @@ if (isset($_GET['month'])) {
     $month = $_GET['month'];
 }
 
-$userClasses = getUserClasses();
-$userSubject = getUserSubjects();
+$userClasses = getMysqlResultToArray(getUserClasses());
+$userSubject = getMysqlResultToArray(getUserSubjects());
 ?>
 
 <!DOCTYPE html>
@@ -271,7 +271,7 @@ $userSubject = getUserSubjects();
                                     <div class="error">Please Choose Class</div>
                                     <?php
                                 } else {
-                                    $classSubjectPair = getUserClassSubject($class_id);
+                                    $classSubjectPair = getMysqlResultToArray(getUserClassSubject($class_id));
 
                                     if (count($classSubjectPair) > 0) {
                                         ?>

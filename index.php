@@ -16,8 +16,8 @@ if (isset($_GET['month'])) {
 }
 
 
-$userClasses = getUserClasses();
-$userSubject = getUserSubjects();
+$userClasses = getMysqlResultToArray(getUserClasses());
+$userSubject = getMysqlResultToArray(getUserSubjects());
 
 ?>
 
