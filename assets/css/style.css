@@ -284,6 +284,7 @@ dialog .scroll-section {}
 .table-record {
     overflow: auto;
     width: 100%;
+    counter-reset: serial-num;
 }
 
 table {
