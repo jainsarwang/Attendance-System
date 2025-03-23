@@ -258,8 +258,8 @@ $userSubject = getUserSubjects();
                         <button class="btn-info" onclick="openAddDialog()">Add New Attendance</button>
                     </div>
 
-                    <dialog class="add-dialog" tabindex="-1">
-                        <div class="close" onclick="closeDialog(event, true)">&times;</div>
+                    <dialog class="add-dialog" tabindex="-1" onclose="closeDialog(event, true)">
+                        <div class="close" onclick="this.closest('dialog').close()">&times;</div>
                         <div class="title">Take Attendance</div>
 
                         <div class="scroll-section center">
@@ -279,7 +279,7 @@ $userSubject = getUserSubjects();
 
                                             <div class="form-field">
                                                 <select name="teaches_id" id="teaches" required>
-                                                    <option selected disabled>Choose Class</option>
+                                                    <option selected disabled value="">Choose Class</option>
                                                     <?php
                                                     foreach ($classSubjectPair as $row) {
                                                         ?>
@@ -292,6 +292,7 @@ $userSubject = getUserSubjects();
                                                 </select>
 
                                                 <select name="class_type">
+                                                    <option value="" selected disabled>Choose Class Type</option>
                                                     <option value="theory">Theory</option>
                                                     <option value="practical">Practical</option>
                                                 </select>
@@ -370,8 +371,8 @@ $userSubject = getUserSubjects();
                         </div>
                     </dialog>
 
-                    <dialog class="edit-dialog" tabindex="-1">
-                        <div class="close" onclick="closeDialog(event, true)">&times;</div>
+                    <dialog class="edit-dialog" tabindex="-1" onclose="closeDialog(event, true)">
+                        <div class="close" onclick="this.closest('dialog').close()">&times;</div>
                         <div class="title">Edit Student Detail</div>
 
                         <div class="scroll-section center">
@@ -391,7 +392,7 @@ $userSubject = getUserSubjects();
                                     </div>
                                     <div class="form-field">
                                         <select name="gender" id="gender" required>
-                                            <option selected disabled>Choose Gender</option>
+                                            <option selected disabled value="">Choose Gender</option>
 
                                             <option value="M">Male</option>
                                             <option value="F">Female</option>
@@ -409,7 +410,7 @@ $userSubject = getUserSubjects();
 
                                     <div class="form-field">
                                         <select name="class" id="class">
-                                            <option selected disabled>Choose Class</option>
+                                            <option selected disabled value="">Choose Class</option>
 
                                             <?php
                                             $query = mysqli_query($con, "SELECT * FROM classes");

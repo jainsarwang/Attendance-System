@@ -14,7 +14,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 			msg.innerHTML = "";
 			while (!(pair = iterator.next()).done) {
-				console.log(pair);
 				body.push(pair.value[0] + "=" + pair.value[1]);
 			}
 
@@ -111,14 +110,26 @@ function openEditDialog(data) {
 }
 
 function closeDialog(e, confirmation = false) {
+	// handle dialog closing
 	const dialog = e.target?.closest("dialog");
-
 	if (!confirmation) return;
 
-	if (confirm("Do you want to close it?")) {
-		dialog?.close();
+	const form = dialog?.querySelector("form");
+	const isFormEmpty = form
+		? Array.from(form.elements).every((element) => {
+				if (element.tagName === "BUTTON" || element.type === "submit") {
+					return true; // Ignore buttons
+				}
+				if (element.type === "radio" || element.type === "checkbox") {
+					return !element.checked;
+				}
+				return !element.value;
+		  })
+		: true; // Consider no form as empty
 
-		dialog.querySelector("form")?.reset();
+	if (isFormEmpty || confirm("Do you want to close it?")) {
+		dialog?.close();
+		form?.reset();
 	}
 }
 

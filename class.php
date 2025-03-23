@@ -150,8 +150,8 @@ if (isset($_GET['class'])) {
                         <button class="btn-info" onclick="openAddDialog()">Add New Class</button>
                     </div>
 
-                    <dialog class="add-dialog" tabindex="-1">
-                        <div class="close" onclick="closeDialog(event, true)">&times;</div>
+                    <dialog class="add-dialog" tabindex="-1" onclose="closeDialog(event, true)">
+                        <div class="close" onclick="this.closest('dialog').close()">&times;</div>
                         <div class="title">New Class Detail</div>
 
                         <div class="scroll-section center">
@@ -191,8 +191,8 @@ if (isset($_GET['class'])) {
                         </div>
                     </dialog>
 
-                    <dialog class="edit-dialog" tabindex="-1">
-                        <div class="close" onclick="closeDialog(event, true)">&times;</div>
+                    <dialog class="edit-dialog" tabindex="-1" onclose="closeDialog(event, true)">
+                        <div class="close" onclick="this.closest('dialog').close()">&times;</div>
                         <div class="title">Edit Class Detail</div>
 
                         <div class="scroll-section center">

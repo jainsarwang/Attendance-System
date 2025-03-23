@@ -206,8 +206,8 @@ if (isset ($_GET['subject'])) {
                         <button class="btn-info" onclick="openAddDialog()">Add New Lecture</button>
                     </div>
 
-                    <dialog class="add-dialog" tabindex="-1">
-                        <div class="close" onclick="closeDialog(event, true)">&times;</div>
+                    <dialog class="add-dialog" tabindex="-1" onclose="closeDialog(event, true)">
+                    <div class="close" onclick="this.closest('dialog').close()">&times;</div>
                         <div class="title">New Lecture Detail</div>
 
                         <div class="scroll-section center">
@@ -215,7 +215,7 @@ if (isset ($_GET['subject'])) {
                                 <form action="<?= $_SERVER['PHP_SELF'] ?>" method="post" autocomplete="off">
                                     <div class="form-field">
                                         <select name="faculty" id="faculty" required>
-                                            <option selected disabled>Choose faculty</option>
+                                            <option selected disabled value="">Choose faculty</option>
 
                                             <?php
                                             $query = mysqli_query($con, "SELECT * FROM users WHERE role = 'faculty' OR role = 'hod' ORDER BY name ASC");
@@ -233,7 +233,7 @@ if (isset ($_GET['subject'])) {
 
                                     <div class="form-field">
                                         <select name="class" id="class" required>
-                                            <option selected disabled>Choose Class</option>
+                                            <option selected disabled value="">Choose Class</option>
 
                                             <?php
                                             $query = mysqli_query($con, "SELECT * FROM classes ORDER BY batch ASC");
@@ -252,7 +252,7 @@ if (isset ($_GET['subject'])) {
 
                                     <div class="form-field">
                                         <select name="subject" id="subject" required>
-                                            <option selected disabled>Choose Subject</option>
+                                            <option selected disabled value="">Choose Subject</option>
 
                                             <?php
                                             $query = mysqli_query($con, "SELECT * FROM subject ORDER BY name ASC");
@@ -279,8 +279,8 @@ if (isset ($_GET['subject'])) {
                         </div>
                     </dialog>
 
-                    <dialog class="edit-dialog" tabindex="-1">
-                        <div class="close" onclick="closeDialog(event, true)">&times;</div>
+                    <dialog class="edit-dialog" tabindex="-1" onclose="closeDialog(event, true)">
+                    <div class="close" onclick="this.closest('dialog').close()">&times;</div>
                         <div class="title">Edit Student Detail</div>
 
                         <div class="scroll-section center">
@@ -290,7 +290,7 @@ if (isset ($_GET['subject'])) {
                                     <input type="hidden" name="id">
                                     <div class="form-field">
                                         <select name="faculty" id="faculty" required>
-                                            <option selected disabled>Choose faculty</option>
+                                            <option selected disabled value="">Choose faculty</option>
 
                                             <?php
                                             $query = mysqli_query($con, "SELECT * FROM users WHERE role = 'faculty' OR role = 'hod' ORDER BY name ASC");
@@ -308,7 +308,7 @@ if (isset ($_GET['subject'])) {
 
                                     <div class="form-field">
                                         <select name="class" id="class" required>
-                                            <option selected disabled>Choose Class</option>
+                                            <option selected disabled value="">Choose Class</option>
 
                                             <?php
                                             $query = mysqli_query($con, "SELECT * FROM classes ORDER BY batch ASC");
@@ -327,7 +327,7 @@ if (isset ($_GET['subject'])) {
 
                                     <div class="form-field">
                                         <select name="subject" id="subject" required>
-                                            <option selected disabled>Choose Subject</option>
+                                            <option selected disabled value="">Choose Subject</option>
 
                                             <?php
                                             $query = mysqli_query($con, "SELECT * FROM subject ORDER BY name ASC");

@@ -8,9 +8,9 @@ if (strtolower($_SERVER['REQUEST_METHOD']) == 'post' || strtolower($_SERVER['REQ
 
     parse_str(file_get_contents('php://input'), $_REQUEST);
 
-    if (!isset ($_REQUEST['subject_code']) || !isset ($_REQUEST['name'])) {
+    if (!isset($_REQUEST['subject_code']) || !isset($_REQUEST['name'])) {
         http_response_code(403);
-        die (json_encode([
+        die(json_encode([
             'status' => 'error',
             'message' => 'All fields are required'
         ]));
@@ -19,9 +19,9 @@ if (strtolower($_SERVER['REQUEST_METHOD']) == 'post' || strtolower($_SERVER['REQ
     $subject_code = mysqli_real_escape_string($con, trim($_REQUEST['subject_code']));
     $name = mysqli_real_escape_string($con, trim($_REQUEST['name']));
 
-    if (empty ($subject_code) || empty ($name)) {
+    if (empty($subject_code) || empty($name)) {
         http_response_code(403);
-        die (json_encode([
+        die(json_encode([
             'status' => 'error',
             'message' => 'All fields are required'
         ]));
@@ -32,15 +32,15 @@ if (strtolower($_SERVER['REQUEST_METHOD']) == 'post' || strtolower($_SERVER['REQ
         // new subject detail
         if (mysqli_num_rows($query) > 0) {
             http_response_code(401);
-            die (json_encode([
+            die(json_encode([
                 'status' => 'error',
                 'message' => 'This Subject code already exists'
             ]));
         }
-        $query = mysqli_query($con, "INSERT INTO subject(subject_code, name) VALUES('$subject_code', '$name')") or die (mysqli_error($con));
+        $query = mysqli_query($con, "INSERT INTO subject(subject_code, name) VALUES('$subject_code', '$name')") or die(mysqli_error($con));
 
         http_response_code(201);
-        die (json_encode([
+        die(json_encode([
             'status' => 'success',
             'message' => 'Subject Added'
         ]));
@@ -48,7 +48,7 @@ if (strtolower($_SERVER['REQUEST_METHOD']) == 'post' || strtolower($_SERVER['REQ
         // updating subject detail
         if (mysqli_num_rows($query) == 0) {
             http_response_code(401);
-            die (json_encode([
+            die(json_encode([
                 'status' => 'error',
                 'message' => 'Invalid Subject Code'
             ]));
@@ -56,7 +56,7 @@ if (strtolower($_SERVER['REQUEST_METHOD']) == 'post' || strtolower($_SERVER['REQ
         $query = mysqli_query($con, "UPDATE subject SET name = '$name' WHERE subject_code = '$subject_code'");
 
 
-        die (json_encode([
+        die(json_encode([
             'status' => 'success',
             'message' => 'Subject Details Updated'
         ]));
@@ -66,9 +66,9 @@ if (strtolower($_SERVER['REQUEST_METHOD']) == 'post' || strtolower($_SERVER['REQ
 } else if (strtolower($_SERVER['REQUEST_METHOD']) == 'delete') {
     parse_str(file_get_contents('php://input'), $_REQUEST);
 
-    if (!isset ($_REQUEST['subject_code']) || empty ($_REQUEST['subject_code'])) {
+    if (!isset($_REQUEST['subject_code']) || empty($_REQUEST['subject_code'])) {
         http_response_code(403);
-        die (json_encode([
+        die(json_encode([
             'status' => 'error',
             'message' => 'Subject Code is Required'
         ]));
@@ -128,8 +128,8 @@ if (strtolower($_SERVER['REQUEST_METHOD']) == 'post' || strtolower($_SERVER['REQ
                         <button class="btn-info" onclick="openAddDialog()">Add New Subject</button>
                     </div>
 
-                    <dialog class="add-dialog" tabindex="-1">
-                        <div class="close" onclick="closeDialog(event, true)">&times;</div>
+                    <dialog class="add-dialog" tabindex="-1" onclose="closeDialog(event, true)">
+                        <div class="close" onclick="this.closest('dialog').close()">&times;</div>
                         <div class="title">New Subject Detail</div>
 
                         <div class="scroll-section center">
@@ -157,8 +157,8 @@ if (strtolower($_SERVER['REQUEST_METHOD']) == 'post' || strtolower($_SERVER['REQ
                         </div>
                     </dialog>
 
-                    <dialog class="edit-dialog" tabindex="-1">
-                        <div class="close" onclick="closeDialog(event, true)">&times;</div>
+                    <dialog class="edit-dialog" tabindex="-1" onclose="closeDialog(event, true)">
+                        <div class="close" onclick="this.closest('dialog').close()">&times;</div>
                         <div class="title">Edit Subject Detail</div>
 
                         <div class="scroll-section center">
