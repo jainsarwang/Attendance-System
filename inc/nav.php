@@ -1,5 +1,7 @@
 <nav>
     <li><a href="./">Dashboard</a></li>
+    <li><a href="timetable.php">Timetable</a></li>
+    <li><a href="student_feedback.php">Student Feedback</a></li>
 
     <?php
     if (
